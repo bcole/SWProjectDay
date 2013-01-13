@@ -14,9 +14,17 @@ public class Employee extends Thread {
 	
 	private boolean isLead;
 	private boolean isWaitingQuestion;
+	private boolean hadLunch;
 	private Office office;
 	
 	public Employee(boolean isLead, Office office){
+		this.isLead = isLead;
+		this.office = office;
+		hadLunch = false;
+		isWaitingQuestion = false;
+	}
+
+	public void run(){
 		try {
 			// Starting all threads at the same time (clock == 0 / "8:00AM").
 			startSignal.await();
@@ -51,10 +59,9 @@ public class Employee extends Thread {
 			}
 			
 			
+			
 		}
-		
 	}
-
 	
 	public void askQuestion(){
 		
