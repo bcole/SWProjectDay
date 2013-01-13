@@ -1,5 +1,4 @@
 package edu.se.se441.threads;
-import Random;
 
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CountDownLatch;
@@ -14,6 +13,7 @@ public class Employee extends Thread {
 	private CyclicBarrier standupMeeting;
 	
 	private boolean isLead;
+	private boolean isWaitingQuestion;
 	private Office office;
 	
 	public Employee(boolean isLead, Office office){
@@ -37,12 +37,29 @@ public class Employee extends Thread {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			int random = r.nextInt(1) + 1;
+			int random = r.nextInt(20);
+			//decides whether or not to ask a question
+			if(random == 0){
+				//Team lead asking a question
+				if(isLead){
+					
+				}
+				//Employee asking a question
+				else{
+					
+				}
+			}
+			
 			
 		}
 		
 	}
 
+	
+	public void askQuestion(){
+		
+	}
+	
 	public void setStartSignal(CountDownLatch startSignal) {
 		this.startSignal = startSignal;
 	}
