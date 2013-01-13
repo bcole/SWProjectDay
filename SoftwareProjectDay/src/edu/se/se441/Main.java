@@ -24,8 +24,8 @@ public class Main {
 		// Create Employees
 		Employee[] employees = new Employee[NUM_OF_EMPLOYEES];
 		for(int i=0; i<NUM_OF_EMPLOYEES; i++){
-//			employees[i] = (i%4==0) ? new Lead(office): new Developer(office);
-//			employees[i].setStartSignal(startSignal);
+			employees[i] = (i%4==0) ? new Employee(true, office): new Employee(false, office);
+			employees[i].setStartSignal(startSignal);
 		}
 		
 		
