@@ -13,5 +13,9 @@ public class Office {
 	public Office(Clock clock){
 		this.clock = clock;
 	}
+	
+	public long getTime(){
+		return clock.getTime();
+	}
 
 }
