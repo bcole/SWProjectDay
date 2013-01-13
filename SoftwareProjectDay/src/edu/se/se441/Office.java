@@ -15,7 +15,9 @@ public class Office {
 	}
 	
 	public long getTime(){
-		return clock.getTime();
+		long time = clock.getTime();
+		time += 8000;
+		return time;
 	}
 
 }
