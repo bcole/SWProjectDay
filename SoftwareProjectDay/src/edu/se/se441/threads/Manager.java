@@ -10,6 +10,7 @@ public class Manager extends Thread {
 	private Office office;
 	private CyclicBarrier standupMeeting;
 	private CountDownLatch startSignal;
+	private boolean hasQuestion;
 	
 	public Manager(Office office){
 		this.office = office;
@@ -26,6 +27,22 @@ public class Manager extends Thread {
 			e.printStackTrace();
 		} catch (BrokenBarrierException e) {
 			e.printStackTrace();
+		}
+		while(true){
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			if(hasQuestion){
+				while(hasQuestion){
+					try {
+						sleep(10);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
 		}
 	}
 	
