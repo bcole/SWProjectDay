@@ -1,7 +1,10 @@
 package edu.se.se441.threads;
+import Random;
+
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
+import java.util.Random;
 
 import edu.se.se441.*;
 
@@ -25,9 +28,18 @@ public class Employee extends Thread {
 		} catch (BrokenBarrierException e) {
 			e.printStackTrace();
 		}
-		
+		Random r = new Random();
 		// Start main while loop here.
-		
+		while(true){
+			try {
+				this.wait();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			int random = r.nextInt(1) + 1;
+			
+		}
 		
 	}
 
