@@ -2,6 +2,7 @@ package edu.se.se441;
 
 import java.util.concurrent.CountDownLatch;
 
+import edu.se.se441.threads.Clock;
 import edu.se.se441.threads.Employee;
 import edu.se.se441.threads.Manager;
 
@@ -14,8 +15,11 @@ public class Main {
 		// Create a latch that will start all the threads at the same time.
 		CountDownLatch startSignal = new CountDownLatch(1);
 		
+		// Create clock thread class, won't start until startSignal counts down.
+		Clock clock = new Clock(startSignal);
+		
 		// Create an office data object
-		Office office = new Office();
+		Office office = new Office(clock);
 		
 		// Create Manager
 		Manager manager = new Manager(office);
@@ -34,6 +38,8 @@ public class Main {
 		for(int i=0; i<NUM_OF_EMPLOYEES; i++){
 			employees[i].start();
 		}
+		clock.start();
+		// Countdown the latch to release the threads.
 		startSignal.countDown();
 		
 	}
