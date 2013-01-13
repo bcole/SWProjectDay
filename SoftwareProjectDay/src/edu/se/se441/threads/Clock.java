@@ -22,5 +22,12 @@ public class Clock extends Thread{
 		// Set the start time of the simulation.
 		startTime = System.currentTimeMillis();
 	}
+	
+	/**
+	 * @return The time of day in ms (0ms is 8:00AM)
+	 */
+	public long getTime(){
+		return System.currentTimeMillis() - startTime;
+	}
 
 }
