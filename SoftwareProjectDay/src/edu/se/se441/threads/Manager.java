@@ -17,6 +17,10 @@ public class Manager extends Thread {
 	
 	public void run(){
 		try {
+			// Starting all threads at the same time (clock == 0 / "8:00AM").
+			startSignal.await();
+			
+			// Waiting for team leads for the meeting.
 			standupMeeting.await();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
