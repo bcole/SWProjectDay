@@ -10,7 +10,10 @@ public class Manager extends Thread {
 	private Office office;
 	private CyclicBarrier standupMeeting;
 	private CountDownLatch startSignal;
-	private boolean hasQuestion;
+	private boolean hasQuestion = false;
+	private boolean attendedMeeting1 = false;
+	private boolean attendedMeeting2 = false;
+	private boolean ateLunch = false;
 	
 	public Manager(Office office){
 		this.office = office;
@@ -28,7 +31,7 @@ public class Manager extends Thread {
 		} catch (BrokenBarrierException e) {
 			e.printStackTrace();
 		}
-		while(true){
+		while(office.getTime() < 1700){
 			try {
 				wait();
 			} catch (InterruptedException e) {
@@ -37,11 +40,35 @@ public class Manager extends Thread {
 			if(hasQuestion){
 				while(hasQuestion){
 					try {
-						sleep(10);
+						sleep(100);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
 				}
+			}
+			if(office.getTime() >= 1000 && !attendedMeeting1){
+				 try {
+					sleep(600);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				 attendedMeeting1 = true;
+			}
+			if(office.getTime() >= 1200 && !ateLunch){
+				try {
+					sleep(600);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}				
+				ateLunch = true;
+			}
+			if(office.getTime() >= 1400 && !attendedMeeting2){
+				try {
+					sleep(600);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				attendedMeeting2 = true;
 			}
 		}
 	}
@@ -52,6 +79,10 @@ public class Manager extends Thread {
 	
 	public void setStartSignal(CountDownLatch startSignal) {
 		this.startSignal = startSignal;
+	}
+	
+	public void askQuestion(){
+		
 	}
 
 }
