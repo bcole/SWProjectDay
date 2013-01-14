@@ -42,11 +42,10 @@ public class Manager extends Thread {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			if(!hasQuestion.isEmpty()){
-				while(!hasQuestion.isEmpty()){
-					answerQuestion();
-				}
+			while(!hasQuestion.isEmpty()){
+				answerQuestion();
 			}
+		
 			if(office.getTime() >= 1000 && !attendedMeeting1){
 				 try {
 					sleep(600);
