@@ -26,7 +26,7 @@ public class Clock extends Thread{
 		startTime = System.currentTimeMillis();
 		while(this.getTime() <= 4800){
 			for(Long t : timeRegistry){
-				if(t >= this.getTime()){
+				if(this.getTime() >= t){
 					notifyAll();
 				}
 			}
