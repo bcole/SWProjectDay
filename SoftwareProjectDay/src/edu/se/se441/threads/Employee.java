@@ -12,7 +12,7 @@ public class Employee extends Thread {
 	private CountDownLatch startSignal;
 	
 	// Times
-	private long dayStartTime, dayEndTime;
+	private long dayStartTime, dayEndTime, lunchTime, lunchDuration;
 	
 	// Meeting attended Booleans
 	private boolean attendedEndOfDayMeeting;
@@ -42,6 +42,10 @@ public class Employee extends Thread {
 			Thread.sleep(10 * r.nextInt(30));
 			dayStartTime = office.getTime();
 			dayEndTime = dayStartTime + 800;	// Work at least 8 hours
+			lunchTime = r.nextInt(200) + 1200;
+			lunchDuration = r.nextInt((int) (1700-dayEndTime-30)) + 30;	// Figure out lunch duration
+			dayEndTime += lunchDuration;	// Add to end time.
+			
 			office.setEndOfDay(dayEndTime);
 			
 			// Waiting for team leads for the meeting.
@@ -75,7 +79,17 @@ public class Employee extends Thread {
 				break;
 			}
 			
-			// Check 2: Is it time for the 4 oclock meeting?
+			// Lunch time?
+			if(office.getTime() >= lunchTime && !hadLunch){
+				try {
+					sleep(lunchDuration*10);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				hadLunch = true;
+			}
+			
+			// Is it time for the 4 oclock meeting?
 			if(office.getTime() >= 1600 && !attendedEndOfDayMeeting){
 				office.waitForEndOfDayMeeting();
 				try {
@@ -101,8 +115,9 @@ public class Employee extends Thread {
 				}
 				//Employee asking a question
 				else{
-					office.getLead(teamNumber).askQuestion();						
-					
+					if(r.nextBoolean()){
+						office.getLead(teamNumber).askQuestion();						
+					}
 				}
 			}
 			
