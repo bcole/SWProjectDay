@@ -24,7 +24,7 @@ public class Clock extends Thread{
 		
 		// Set the start time of the simulation.
 		startTime = System.currentTimeMillis();
-		while(this.getTime() <= 4800){
+		while(this.getTime() <= 5400){ //Simulation starts at 800 (time 0000) and ends at 1700 (time 5400).
 			for(Long t : timeRegistry){
 				if(this.getTime() >= t){
 					notifyAll();
