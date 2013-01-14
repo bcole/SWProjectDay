@@ -24,7 +24,7 @@ public class Clock extends Thread{
 		
 		// Set the start time of the simulation.
 		startTime = System.currentTimeMillis();
-		while(this.getTime() > 4800){
+		while(this.getTime() <= 4800){
 			for(Long t : timeRegistry){
 				if(t >= this.getTime()){
 					notifyAll();
