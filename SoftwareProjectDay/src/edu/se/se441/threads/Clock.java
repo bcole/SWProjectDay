@@ -1,14 +1,17 @@
 package edu.se.se441.threads;
 
+import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 
 public class Clock extends Thread{
 	
 	private CountDownLatch startSignal;
 	private long startTime;	// When the simulation starts.
+	private ArrayList<Long> timeRegistry;
 	
 	public Clock(CountDownLatch startSignal){
 		this.startSignal = startSignal;
+		timeRegistry = new ArrayList();
 	}
 	
 	public void run(){
@@ -21,6 +24,13 @@ public class Clock extends Thread{
 		
 		// Set the start time of the simulation.
 		startTime = System.currentTimeMillis();
+		while(true){
+			for(Long t : timeRegistry){
+				if(t >= this.getTime()){
+					notifyAll();
+				}
+			}
+		}
 	}
 	
 	/**
@@ -30,4 +40,7 @@ public class Clock extends Thread{
 		return System.currentTimeMillis() - startTime;
 	}
 
+	public void addTimeEvent(long timeOfEvent){
+		timeRegistry.add(timeOfEvent);
+	}
 }
