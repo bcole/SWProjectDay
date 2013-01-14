@@ -13,7 +13,6 @@ public class Manager extends Thread {
 	final int NUMQUESTIONS = 10;
 	
 	private Office office;
-	private CyclicBarrier standupMeeting;
 	private CountDownLatch startSignal;
 	private BlockingQueue<Employee> hasQuestion = new ArrayBlockingQueue<Employee>(NUMQUESTIONS);
 	private boolean attendedMeeting1 = false;
@@ -31,9 +30,9 @@ public class Manager extends Thread {
 			startSignal.await();
 			
 			// Waiting for team leads for the meeting.
-			standupMeeting.await();
+			office.waitForStandupMeeting();
 			Thread.sleep(150);
-		} catch (InterruptedException | BrokenBarrierException e) {
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		
@@ -73,10 +72,6 @@ public class Manager extends Thread {
 				attendedMeeting2 = true;
 			}
 		}
-	}
-	
-	public void setStandupBarrier(CyclicBarrier standupBarrier){
-		standupMeeting = standupBarrier;
 	}
 	
 	public void setStartSignal(CountDownLatch startSignal) {

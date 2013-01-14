@@ -1,6 +1,7 @@
 // Test
 package edu.se.se441;
 
+import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 import edu.se.se441.threads.Clock;
@@ -26,6 +27,14 @@ public class Office {
 		return time;
 	}
 	
+	public void waitForStandupMeeting(){
+		try {
+			standupMeeting.await();
+		} catch (InterruptedException | BrokenBarrierException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void enterOffice() {
 	    timeRegistry[numEmployeesCheckedIn] = getTime();
 	    numEmployeesCheckedIn++;
@@ -43,3 +52,4 @@ public class Office {
 	}
 
 }
+

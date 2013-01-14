@@ -10,7 +10,9 @@ import edu.se.se441.*;
 public class Employee extends Thread {
 	// Latches and Barries
 	private CountDownLatch startSignal;
-	private CyclicBarrier standupMeeting;
+	
+	// Times
+	private long dayStartTime, dayEndTime;
 	
 	private boolean isLead;
 	private boolean isWaitingQuestion;
@@ -25,26 +27,43 @@ public class Employee extends Thread {
 	}
 
 	public void run(){
+		Random r = new Random();
 		try {
 			// Starting all threads at the same time (clock == 0 / "8:00AM").
 			startSignal.await();
 			
+			// Arrive sometime between 8:00 and 8:30
+			Thread.sleep(10 * r.nextInt(30));
+			dayStartTime = office.getTime();
+			dayEndTime = dayStartTime + 800;	// Work at least 8 hours
+			
 			// Waiting for team leads for the meeting.
-			if(isLead) standupMeeting.await();
+			if(isLead){
+				office.waitForStandupMeeting();
+				Thread.sleep(150);
+			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		} catch (BrokenBarrierException e) {
-			e.printStackTrace();
 		}
-		Random r = new Random();
+		
 		// Start main while loop here.
 		while(true){
 			try {
-				this.wait();
+				wait();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			// Check 1: Is it time to go home?
+			if(office.getTime() >= dayEndTime){
+				// End the thread
+				break;
+			}
+			
+			
+			
+			
+			// Last Check
+			// Check 2: Should a question be asked?
 			int random = r.nextInt(20);
 			//decides whether or not to ask a question
 			if(random == 0){
@@ -69,9 +88,5 @@ public class Employee extends Thread {
 	
 	public void setStartSignal(CountDownLatch startSignal) {
 		this.startSignal = startSignal;
-	}
-	
-	public void setStandupBarrier(CyclicBarrier standupBarrier){
-		standupMeeting = standupBarrier;
 	}
 }
