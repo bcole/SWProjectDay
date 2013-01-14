@@ -126,15 +126,20 @@ public class Employee extends Thread {
 		}
 	}
 	
-	
+	// Only for Team Leaders, called when asked a question that needs to be passed up to manager.
 	public void askQuestion(){
 		Employee teamLeader = office.getLead(teamNumber);
 		try {
+			// Leader already has a question that hasn't been answered.
 			while(teamLeader.isWaitingQuestion){
 				wait();
 			}
+			
+			// Set our question.
 			teamLeader.getsQuestion();
 			notifyAll();
+			
+			// Is the manager answering the question
 			while(office.getManager().isLeadAsking(teamLeader)){
 				if(office.getTime() >= 1600 && !attendedEndOfDayMeeting){
 					office.waitForEndOfDayMeeting();
