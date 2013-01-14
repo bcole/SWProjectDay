@@ -11,7 +11,7 @@ public class Clock extends Thread{
 	
 	public Clock(CountDownLatch startSignal){
 		this.startSignal = startSignal;
-		timeRegistry = new ArrayList();
+		timeRegistry = new ArrayList<Long>();
 	}
 	
 	public void run(){
