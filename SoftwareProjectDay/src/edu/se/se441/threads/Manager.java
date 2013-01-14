@@ -19,6 +19,7 @@ public class Manager extends Thread {
 	private boolean attendedMeeting1 = false;
 	private boolean attendedMeeting2 = false;
 	private boolean ateLunch = false;
+	private boolean attendedFinaMeeting = false;
 	
 	public Manager(Office office){
 		this.office = office;
@@ -31,11 +32,11 @@ public class Manager extends Thread {
 			
 			// Waiting for team leads for the meeting.
 			standupMeeting.await();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (BrokenBarrierException e) {
+			Thread.sleep(150);
+		} catch (InterruptedException | BrokenBarrierException e) {
 			e.printStackTrace();
 		}
+		
 		while(office.getTime() < 1700){
 			try {
 				wait();
