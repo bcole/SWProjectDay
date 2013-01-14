@@ -118,6 +118,10 @@ public class Manager extends Thread {
 		
 	}
 	
+	public boolean isLeadAsking(Employee lead){
+		return hasQuestion.contains(lead);
+	}
+	
 	private void answerQuestion(){
 		hasQuestion.poll();
 		notifyAll();

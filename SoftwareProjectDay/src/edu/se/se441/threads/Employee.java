@@ -86,6 +86,10 @@ public class Employee extends Thread {
 				attendedEndOfDayMeeting = true;
 			}
 			
+			if(isLead && isWaitingQuestion){
+				office.getManager().askQuestion(this);
+			}
+			
 			// Last Check
 			// Check 2: Should a question be asked?
 			int random = r.nextInt(20);
@@ -97,6 +101,7 @@ public class Employee extends Thread {
 				}
 				//Employee asking a question
 				else{
+					office.getLead(teamNumber).askQuestion();						
 					
 				}
 			}
@@ -108,11 +113,42 @@ public class Employee extends Thread {
 	
 	
 	public void askQuestion(){
-		
+		Employee teamLeader = office.getLead(teamNumber);
+		try {
+			while(teamLeader.isWaitingQuestion){
+				wait();
+			}
+			teamLeader.getsQuestion();
+			notifyAll();
+			while(office.getManager().isLeadAsking(teamLeader)){
+				if(office.getTime() >= 1600 && !attendedEndOfDayMeeting){
+					office.waitForEndOfDayMeeting();
+					sleep(150);
+					attendedEndOfDayMeeting = true;
+				}
+				wait();
+			}
+		}catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		try {
+			sleep(100);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		teamLeader.questionAnswered();
 	}
 	
 	public void setStartSignal(CountDownLatch startSignal) {
 		this.startSignal = startSignal;
+	}
+	
+	public void getsQuestion(){
+		isWaitingQuestion = true;
+	}
+	
+	public void questionAnswered(){
+		isWaitingQuestion = false;
 	}
 
 	public boolean isAttendedEndOfDayMeeting() {
