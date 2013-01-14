@@ -11,7 +11,7 @@ public class Clock extends Thread{
 	
 	public Clock(CountDownLatch startSignal){
 		this.startSignal = startSignal;
-		timeRegistry = new ArrayList();
+		timeRegistry = new ArrayList<Long>();
 	}
 	
 	public void run(){
@@ -24,9 +24,9 @@ public class Clock extends Thread{
 		
 		// Set the start time of the simulation.
 		startTime = System.currentTimeMillis();
-		while(this.getTime() > 4800){
+		while(this.getTime() <= 4800){
 			for(Long t : timeRegistry){
-				if(t >= this.getTime()){
+				if(this.getTime() >= t){
 					notifyAll();
 				}
 			}
