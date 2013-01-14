@@ -21,7 +21,7 @@ public class Office {
 	private boolean confRoom;
 	private int confRoomUsedBy = 0;
 
-	private Object confRoomLock;
+	private Object confRoomLock = new Object();
 	private long[] timeRegistry;
 	private int numEmployeesCheckedIn;
 	
@@ -71,7 +71,9 @@ public class Office {
 						teamMeetings[teamNumber].reset();
 					} else {
 						// Wait until the room is open.
-						wait();
+						synchronized(Thread.currentThread()){
+							wait();
+						}
 					}
 				}
 				// Synchronize other team members to start the meeting at the same time.

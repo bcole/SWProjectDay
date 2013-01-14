@@ -39,7 +39,9 @@ public class Manager extends Thread {
 		
 		while(office.getTime() < 1700){
 			try {
-				wait();
+				synchronized(this){
+					wait();
+				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
