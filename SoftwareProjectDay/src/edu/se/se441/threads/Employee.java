@@ -41,6 +41,9 @@ public class Employee extends Thread {
 			
 			// Arrive sometime between 8:00 and 8:30
 			Thread.sleep(10 * r.nextInt(30));
+			
+
+			System.out.println(office.getTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " arrives at office");
 			dayStartTime = office.getTime();
 			dayEndTime = dayStartTime + 800;	// Work at least 8 hours
 			lunchTime = r.nextInt(200) + 1200;
@@ -52,6 +55,7 @@ public class Employee extends Thread {
 			// Waiting for team leads for the meeting.
 			if(isLead){
 				office.waitForStandupMeeting();
+				System.out.println(office.getTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " is at standup meeting");
 				Thread.sleep(150);
 			}
 			
@@ -59,9 +63,7 @@ public class Employee extends Thread {
 			office.waitForTeamMeeting(teamNumber);
 			office.haveTeamMeeting(teamNumber);
 			
-			
-			
-			
+			System.out.println(office.getTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " has team meeting");
 			Thread.sleep(150);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -83,6 +85,7 @@ public class Employee extends Thread {
 			// Lunch time?
 			if(office.getTime() >= lunchTime && !hadLunch){
 				try {
+					System.out.println(office.getTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " goes to lunch");
 					sleep(lunchDuration*10);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -94,6 +97,7 @@ public class Employee extends Thread {
 			if(office.getTime() >= 1600 && !attendedEndOfDayMeeting){
 				office.waitForEndOfDayMeeting();
 				try {
+					System.out.println(office.getTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " attends end of day meeting");
 					sleep(150);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -121,8 +125,8 @@ public class Employee extends Thread {
 					}
 				}
 			}
-			
 		}
+		System.out.println(office.getTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " leaves");
 	}
 	
 	// Only for Team Leaders, called when asked a question that needs to be passed up to manager.
