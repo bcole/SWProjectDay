@@ -14,11 +14,15 @@ public class Employee extends Thread {
 	// Times
 	private long dayStartTime, dayEndTime;
 	
+	// Meeting attended Booleans
+	private boolean attendedEndOfDayMeeting;
+	
 	private int teamNumber;
 	private boolean isLead;
 	private boolean isWaitingQuestion;
 	private boolean hadLunch;
 	private Office office;
+
 	
 	public Employee(boolean isLead, Office office, int teamNumber){
 		this.isLead = isLead;
@@ -37,8 +41,8 @@ public class Employee extends Thread {
 			// Arrive sometime between 8:00 and 8:30
 			Thread.sleep(10 * r.nextInt(30));
 			dayStartTime = office.getTime();
-			office.enterOffice();
 			dayEndTime = dayStartTime + 800;	// Work at least 8 hours
+			office.setEndOfDay(dayEndTime);
 			
 			// Waiting for team leads for the meeting.
 			if(isLead){
@@ -71,8 +75,16 @@ public class Employee extends Thread {
 				break;
 			}
 			
-			
-			
+			// Check 2: Is it time for the 4 oclock meeting?
+			if(office.getTime() >= 1600 && !attendedEndOfDayMeeting){
+				office.waitForEndOfDayMeeting();
+				try {
+					sleep(150);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				attendedEndOfDayMeeting = true;
+			}
 			
 			// Last Check
 			// Check 2: Should a question be asked?
@@ -81,7 +93,7 @@ public class Employee extends Thread {
 			if(random == 0){
 				//Team lead asking a question
 				if(isLead){
-					
+					office.getManager().askQuestion(this);
 				}
 				//Employee asking a question
 				else{
@@ -94,11 +106,20 @@ public class Employee extends Thread {
 		}
 	}
 	
+	
 	public void askQuestion(){
 		
 	}
 	
 	public void setStartSignal(CountDownLatch startSignal) {
 		this.startSignal = startSignal;
+	}
+
+	public boolean isAttendedEndOfDayMeeting() {
+		return attendedEndOfDayMeeting;
+	}
+
+	public void setAttendedEndOfDayMeeting(boolean attendedEndOfDayMeeting) {
+		this.attendedEndOfDayMeeting = attendedEndOfDayMeeting;
 	}
 }

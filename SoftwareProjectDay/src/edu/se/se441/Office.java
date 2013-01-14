@@ -4,7 +4,7 @@ package edu.se.se441;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
-import edu.se.se441.threads.Clock;
+import edu.se.se441.threads.*;
 
 public class Office {
 	private Clock clock;
@@ -12,6 +12,11 @@ public class Office {
 	// Barriers
 	private CyclicBarrier standupMeeting = new CyclicBarrier(4);
 	private CyclicBarrier[] teamMeetings = new CyclicBarrier[3];
+	private CyclicBarrier endOfDayMeeting = new CyclicBarrier(13);
+	
+	// Manager and Employees
+	private Manager manager;
+	private Employee[] leads = new Employee[3];
 	
 	private boolean confRoom;
 	private int confRoomUsedBy = 0;
@@ -55,12 +60,67 @@ public class Office {
 			e.printStackTrace();
 		}
 	}
+
+	public void haveTeamMeeting(int teamNumber) {
+		try {
+			synchronized(confRoomLock){
+				while(getConfRoomUsedBy() != teamNumber){
+					if(confRoomOpen()){
+						// Fill the room.
+						fillConfRoom(teamNumber);
+						teamMeetings[teamNumber].reset();
+					} else {
+						// Wait until the room is open.
+						wait();
+					}
+				}
+				// Synchronize other team members to start the meeting at the same time.
+				teamMeetings[teamNumber].await();
+			}
+			// Meeting starts.
+			Thread.sleep(150);
+			// Meeting ends.
+			emptyConfRoom();		
+		} catch (InterruptedException | BrokenBarrierException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void waitForEndOfDayMeeting() {
+		try {
+			endOfDayMeeting.await();
+		} catch (InterruptedException | BrokenBarrierException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	
 	
-	public synchronized void enterOffice() {
-	    timeRegistry[numEmployeesCheckedIn] = getTime() + 800;
-	    numEmployeesCheckedIn++;
+	// Getters and setters for Manager and Leads
+	public Manager getManager() {
+		return manager;
+	}
+
+	public void setManager(Manager manager) {
+		this.manager = manager;
+	}
+
+	public Employee getLead(int teamNumber) {
+		return leads[teamNumber];
+	}
+	
+	public void setLead(int teamNumber, Employee lead) {
+		this.leads[teamNumber] = lead;
+	}
+
+	
+	
+	
+	public synchronized void setEndOfDay(long time) {
+	    //timeRegistry[numEmployeesCheckedIn] = time;
+	    //numEmployeesCheckedIn++;
+		
+//		clock.addTimeEvent(time);
 	}
 	public boolean confRoomOpen() {
 		synchronized(confRoomLock){
@@ -89,31 +149,6 @@ public class Office {
 
 	public void setConfRoomUsedBy(int confRoomUsedBy) {
 		this.confRoomUsedBy = confRoomUsedBy;
-	}
-
-	public void haveTeamMeeting(int teamNumber) {
-		try {
-			synchronized(confRoomLock){
-				while(getConfRoomUsedBy() != teamNumber){
-					if(confRoomOpen()){
-						// Fill the room.
-						fillConfRoom(teamNumber);
-						teamMeetings[teamNumber].reset();
-					} else {
-						// Wait until the room is open.
-						wait();
-					}
-				}
-				// Synchronize other team members to start the meeting at the same time.
-				teamMeetings[teamNumber].await();
-			}
-			// Meeting starts.
-			Thread.sleep(150);
-			// Meeting ends.
-			emptyConfRoom();		
-		} catch (InterruptedException | BrokenBarrierException e) {
-			e.printStackTrace();
-		}
 	}
 
 }

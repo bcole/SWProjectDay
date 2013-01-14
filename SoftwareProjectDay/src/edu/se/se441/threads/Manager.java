@@ -18,7 +18,8 @@ public class Manager extends Thread {
 	private boolean attendedMeeting1 = false;
 	private boolean attendedMeeting2 = false;
 	private boolean ateLunch = false;
-	private boolean attendedFinaMeeting = false;
+	private boolean attendedFinalMeeting = false;
+
 	
 	public Manager(Office office){
 		this.office = office;
@@ -45,7 +46,6 @@ public class Manager extends Thread {
 			while(!hasQuestion.isEmpty()){
 				answerQuestion();
 			}
-		
 			if(office.getTime() >= 1000 && !attendedMeeting1){
 				 try {
 					sleep(600);
@@ -70,6 +70,17 @@ public class Manager extends Thread {
 				}
 				attendedMeeting2 = true;
 			}
+			
+			// Is it time for the 4 oclock meeting?
+			if(office.getTime() >= 1600 && !attendedFinalMeeting){
+				office.waitForEndOfDayMeeting();
+				try {
+					sleep(150);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				attendedFinalMeeting = true;
+			}
 		}
 	}
 	
@@ -78,26 +89,43 @@ public class Manager extends Thread {
 	}
 	
 	public void askQuestion(Employee employee){
+		// Add question to queue
 		synchronized(hasQuestion){
 			hasQuestion.add(employee);
 		}
+		
+		// Waiting until question can be answered
 		while(hasQuestion.contains(employee)){
+			// Is it time for the 4 oclock meeting?
 			try {
+				if(office.getTime() >= 1600 && !employee.isAttendedEndOfDayMeeting()){
+					office.waitForEndOfDayMeeting();
+					sleep(150);
+					employee.setAttendedEndOfDayMeeting(true);
+				}
 				wait();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
-	}
-	
-	private void answerQuestion(){
+		
+		// Question is being answered
 		try {
 			sleep(100);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		
+	}
+	
+	private void answerQuestion(){
 		hasQuestion.poll();
 		notifyAll();
+		try {
+			sleep(100);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
