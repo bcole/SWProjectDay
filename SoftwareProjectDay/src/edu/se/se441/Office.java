@@ -9,9 +9,14 @@ public class Office {
 	private Clock clock;
 	private CyclicBarrier standupMeeting = new CyclicBarrier(4);
 	private boolean confRoom;
+	private long[] timeRegistry;
+	private int numEmployeesCheckedIn;
 	
 	public Office(Clock clock){
 		this.clock = clock;
+		confRoom = true;
+		timeRegistry = new long[12];
+		numEmployeesCheckedIn = 0;
 	}
 	
 	public long getTime(){
@@ -19,6 +24,22 @@ public class Office {
 		time = time/10;
 		time += 800;
 		return time;
+	}
+	
+	public void enterOffice() {
+	    timeRegistry[numEmployeesCheckedIn] = getTime();
+	    numEmployeesCheckedIn++;
+	}
+	public boolean confRoomOpen() {
+	    return confRoom;
+	}
+	
+	public void fillConfRoom() {
+	    confRoom = false;
+	}
+	
+	public void emptyConfRoom() {
+	    confRoom = true;
 	}
 
 }
