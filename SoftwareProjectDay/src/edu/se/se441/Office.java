@@ -56,6 +56,7 @@ public class Office {
 	public void waitForTeamMeeting(int teamNumber){
 		try {
 			teamMeetings[teamNumber].await();
+			System.out.println(getTime() + " Team " + (int)(teamNumber+1) + " is ready to have team meeting");
 		} catch (InterruptedException | BrokenBarrierException e) {
 			e.printStackTrace();
 		}
