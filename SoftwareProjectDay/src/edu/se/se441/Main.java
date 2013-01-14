@@ -12,6 +12,8 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		System.out.println("Starting simulation");
+		
 		// Create a latch that will start all the threads at the same time.
 		CountDownLatch startSignal = new CountDownLatch(1);
 		
@@ -29,7 +31,7 @@ public class Main {
 		Employee[] employees = new Employee[NUM_OF_EMPLOYEES];
 		
 		for(int i=0; i<NUM_OF_EMPLOYEES; i++){
-			employees[i] = (i%4==0) ? new Employee(true, office, i/4): new Employee(false, office, i/4);
+			employees[i] = (i%4==0) ? new Employee(true, office, i/4, i%4): new Employee(false, office, i/4, i%4);
 			employees[i].setStartSignal(startSignal);
 		}
 		

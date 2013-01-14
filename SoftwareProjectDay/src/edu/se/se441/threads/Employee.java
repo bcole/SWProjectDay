@@ -17,19 +17,20 @@ public class Employee extends Thread {
 	// Meeting attended Booleans
 	private boolean attendedEndOfDayMeeting;
 	
-	private int teamNumber;
+	private int teamNumber, empNumber;
 	private boolean isLead;
 	private boolean isWaitingQuestion;
 	private boolean hadLunch;
 	private Office office;
 
 	
-	public Employee(boolean isLead, Office office, int teamNumber){
+	public Employee(boolean isLead, Office office, int teamNumber, int empNumber){
 		this.isLead = isLead;
 		this.office = office;
 		hadLunch = false;
 		isWaitingQuestion = false;
 		this.teamNumber = teamNumber;
+		this.empNumber = empNumber;
 	}
 
 	public void run(){
