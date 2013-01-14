@@ -1,5 +1,7 @@
 package edu.se.se441.threads;
 
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
@@ -7,10 +9,13 @@ import java.util.concurrent.CyclicBarrier;
 import edu.se.se441.Office;
 
 public class Manager extends Thread {
+	
+	final int NUMQUESTIONS = 10;
+	
 	private Office office;
 	private CyclicBarrier standupMeeting;
 	private CountDownLatch startSignal;
-	private boolean hasQuestion = false;
+	private BlockingQueue<Employee> hasQuestion = new ArrayBlockingQueue<Employee>(NUMQUESTIONS);
 	private boolean attendedMeeting1 = false;
 	private boolean attendedMeeting2 = false;
 	private boolean ateLunch = false;
@@ -37,13 +42,9 @@ public class Manager extends Thread {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			if(hasQuestion){
-				while(hasQuestion){
-					try {
-						sleep(100);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+			if(!hasQuestion.isEmpty()){
+				while(!hasQuestion.isEmpty()){
+					answerQuestion();
 				}
 			}
 			if(office.getTime() >= 1000 && !attendedMeeting1){
@@ -81,8 +82,27 @@ public class Manager extends Thread {
 		this.startSignal = startSignal;
 	}
 	
-	public void askQuestion(){
-		
+	public void askQuestion(Employee employee){
+		synchronized(hasQuestion){
+			hasQuestion.add(employee);
+		}
+		while(hasQuestion.contains(employee)){
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private void answerQuestion(){
+		try {
+			sleep(100);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		hasQuestion.poll();
+		notifyAll();
 	}
 
 }
