@@ -19,7 +19,7 @@ public class Office {
 	private Employee[] leads = new Employee[3];
 	
 	private boolean confRoom;
-	private int confRoomUsedBy = 0;
+	private int confRoomUsedBy = -1;
 
 	private Object confRoomLock = new Object();
 	private long[] timeRegistry;
@@ -71,15 +71,20 @@ public class Office {
 						fillConfRoom(teamNumber);
 						teamMeetings[teamNumber].reset();
 					} else {
+						System.out.println("stuck");
 						// Wait until the room is open.
 						synchronized(Thread.currentThread()){
 							wait();
 						}
 					}
 				}
-				// Synchronize other team members to start the meeting at the same time.
-				teamMeetings[teamNumber].await();
+				
 			}
+			// Synchronize other team members to start the meeting at the same time.
+			System.out.println("Before");
+			teamMeetings[teamNumber].await();
+			System.out.println("After");
+			
 			// Meeting starts.
 			Thread.sleep(150);
 			// Meeting ends.
@@ -132,16 +137,20 @@ public class Office {
 	}
 	
 	public void fillConfRoom(int teamNumber) {
+		System.out.println("filling1");
 		synchronized(confRoomLock){
+			System.out.println("filling2");
 			confRoom = false;
 			confRoomUsedBy = teamNumber;
+			System.out.println("filling3");
 		}
+		System.out.println("filling4");
 	}
 	
 	public void emptyConfRoom() {
 		synchronized(confRoomLock){
 			confRoom = true;
-			confRoomUsedBy = 0;
+			confRoomUsedBy = -1;
 		}
 		notifyAll();
 	}

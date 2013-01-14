@@ -64,7 +64,6 @@ public class Employee extends Thread {
 			office.haveTeamMeeting(teamNumber);
 			
 			System.out.println(office.getTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " has team meeting");
-			Thread.sleep(150);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
