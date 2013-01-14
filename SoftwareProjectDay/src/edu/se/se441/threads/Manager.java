@@ -110,12 +110,13 @@ public class Manager extends Thread {
 		}
 		
 		// Question is being answered
-		try {
-			sleep(100);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		while(employee.isWaitingQuestion()){
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
-		
 	}
 	
 	public boolean isLeadAsking(Employee lead){
@@ -123,13 +124,16 @@ public class Manager extends Thread {
 	}
 	
 	private void answerQuestion(){
-		hasQuestion.poll();
+		Employee employee = hasQuestion.poll();
 		notifyAll();
 		try {
 			sleep(100);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		
+		employee.questionAnswered();
+		notifyAll();
 	}
 
 }

@@ -116,20 +116,19 @@ public class Employee extends Thread {
 				//Employee asking a question
 				else{
 					if(r.nextBoolean()){
-						office.getLead(teamNumber).askQuestion();						
+						office.getLead(teamNumber).askQuestion(this);						
 					}
 				}
 			}
-			
-			
 			
 		}
 	}
 	
 	// Only for Team Leaders, called when asked a question that needs to be passed up to manager.
-	public void askQuestion(){
+	public void askQuestion(Employee asker){
 		Employee teamLeader = office.getLead(teamNumber);
 		try {
+			//TODO add synchronized block.
 			// Leader already has a question that hasn't been answered.
 			while(teamLeader.isWaitingQuestion){
 				wait();
@@ -138,6 +137,14 @@ public class Employee extends Thread {
 			// Set our question.
 			teamLeader.getsQuestion();
 			notifyAll();
+			
+			
+			while(teamLeader.isWaitingQuestion){
+				wait();
+			}
+			
+			
+			
 			
 			// Is the manager answering the question
 			while(office.getManager().isLeadAsking(teamLeader)){
@@ -169,6 +176,10 @@ public class Employee extends Thread {
 	
 	public void questionAnswered(){
 		isWaitingQuestion = false;
+	}
+	
+	public boolean isWaitingQuestion() {
+		return isWaitingQuestion;
 	}
 
 	public boolean isAttendedEndOfDayMeeting() {
