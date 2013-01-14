@@ -29,7 +29,7 @@ public class Main {
 		Employee[] employees = new Employee[NUM_OF_EMPLOYEES];
 		
 		for(int i=0; i<NUM_OF_EMPLOYEES; i++){
-			employees[i] = (i%4==0) ? new Employee(true, office): new Employee(false, office);
+			employees[i] = (i%4==0) ? new Employee(true, office, i/4): new Employee(false, office, i/4);
 			employees[i].setStartSignal(startSignal);
 		}
 		

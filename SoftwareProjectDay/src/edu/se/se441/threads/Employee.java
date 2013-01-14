@@ -14,16 +14,18 @@ public class Employee extends Thread {
 	// Times
 	private long dayStartTime, dayEndTime;
 	
+	private int teamNumber;
 	private boolean isLead;
 	private boolean isWaitingQuestion;
 	private boolean hadLunch;
 	private Office office;
 	
-	public Employee(boolean isLead, Office office){
+	public Employee(boolean isLead, Office office, int teamNumber){
 		this.isLead = isLead;
 		this.office = office;
 		hadLunch = false;
 		isWaitingQuestion = false;
+		this.teamNumber = teamNumber;
 	}
 
 	public void run(){
@@ -35,6 +37,7 @@ public class Employee extends Thread {
 			// Arrive sometime between 8:00 and 8:30
 			Thread.sleep(10 * r.nextInt(30));
 			dayStartTime = office.getTime();
+			office.enterOffice();
 			dayEndTime = dayStartTime + 800;	// Work at least 8 hours
 			
 			// Waiting for team leads for the meeting.
@@ -42,6 +45,15 @@ public class Employee extends Thread {
 				office.waitForStandupMeeting();
 				Thread.sleep(150);
 			}
+			
+			// Wait for the team meeting to start.
+			office.waitForTeamMeeting(teamNumber);
+			office.haveTeamMeeting(teamNumber);
+			
+			
+			
+			
+			Thread.sleep(150);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
