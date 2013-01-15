@@ -48,7 +48,9 @@ public class Office {
 	public void waitForStandupMeeting(){
 		try {
 			standupMeeting.await();
-		} catch (InterruptedException | BrokenBarrierException e) {
+		} catch (BrokenBarrierException e ) {
+			e.printStackTrace();
+		} catch(InterruptedException e){
 			e.printStackTrace();
 		}
 	}
@@ -57,7 +59,9 @@ public class Office {
 		try {
 			teamMeetings[teamNumber].await();
 			System.out.println(getTime() + " Team " + (int)(teamNumber+1) + " is ready to have team meeting");
-		} catch (InterruptedException | BrokenBarrierException e) {
+		} catch (BrokenBarrierException e) {
+			e.printStackTrace();
+		} catch(InterruptedException e){
 			e.printStackTrace();
 		}
 	}
