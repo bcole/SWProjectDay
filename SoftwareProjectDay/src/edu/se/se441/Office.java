@@ -93,7 +93,9 @@ public class Office {
 			Thread.sleep(150);
 			// Meeting ends.
 			emptyConfRoom();		
-		} catch (InterruptedException | BrokenBarrierException e) {
+		} catch (BrokenBarrierException e) {
+			e.printStackTrace();
+		} catch(InterruptedException e){
 			e.printStackTrace();
 		}
 	}
@@ -101,8 +103,10 @@ public class Office {
 	public void waitForEndOfDayMeeting() {
 		try {
 			endOfDayMeeting.await();
-		} catch (InterruptedException | BrokenBarrierException e) {
+		} catch (BrokenBarrierException e) {
 			e.printStackTrace();
+		} catch(InterruptedException e){
+			
 		}
 	}
 	
