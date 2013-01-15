@@ -61,7 +61,7 @@ public class Employee extends Thread {
 			
 			// Wait for the team meeting to start.
 			office.waitForTeamMeeting(teamNumber);
-			office.haveTeamMeeting(teamNumber);
+			office.haveTeamMeeting(teamNumber, this);
 			
 			System.out.println(office.getTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " has team meeting");
 		} catch (InterruptedException e) {
@@ -192,5 +192,10 @@ public class Employee extends Thread {
 
 	public void setAttendedEndOfDayMeeting(boolean attendedEndOfDayMeeting) {
 		this.attendedEndOfDayMeeting = attendedEndOfDayMeeting;
+	}
+	
+	public String getEmployeeName(){
+		String name = (int)(teamNumber+1) + "" + (int)(empNumber+1);
+		return name;
 	}
 }

@@ -48,9 +48,7 @@ public class Office {
 	public void waitForStandupMeeting(){
 		try {
 			standupMeeting.await();
-		} catch (BrokenBarrierException e ) {
-			e.printStackTrace();
-		} catch(InterruptedException e){
+		} catch (InterruptedException | BrokenBarrierException e) {
 			e.printStackTrace();
 		}
 	}
@@ -58,44 +56,38 @@ public class Office {
 	public void waitForTeamMeeting(int teamNumber){
 		try {
 			teamMeetings[teamNumber].await();
-			System.out.println(getTime() + " Team " + (int)(teamNumber+1) + " is ready to have team meeting");
-		} catch (BrokenBarrierException e) {
-			e.printStackTrace();
-		} catch(InterruptedException e){
+		} catch (InterruptedException | BrokenBarrierException e) {
 			e.printStackTrace();
 		}
 	}
-
-	public void haveTeamMeeting(int teamNumber) {
+	
+	public void haveTeamMeeting(int teamNumber, Employee employee) {
 		try {
-			synchronized(confRoomLock){
+			synchronized(employee){
 				while(getConfRoomUsedBy() != teamNumber){
 					if(confRoomOpen()){
 						// Fill the room.
-						fillConfRoom(teamNumber);
 						teamMeetings[teamNumber].reset();
+						fillConfRoom(teamNumber);
 					} else {
-						System.out.println("stuck");
+						//System.out.println(employee.getEmployeeName() + " stuck")
 						// Wait until the room is open.
-						synchronized(Thread.currentThread()){
-							wait();
-						}
+						employee.wait();
+					
+						//System.out.println(employee.getEmployeeName() + " Unstuck");
 					}
 				}
 				
 			}
 			// Synchronize other team members to start the meeting at the same time.
-			System.out.println("Before");
+			System.out.println(employee.getEmployeeName() +" waiting for team meeting to start.");
 			teamMeetings[teamNumber].await();
-			System.out.println("After");
 			
 			// Meeting starts.
 			Thread.sleep(150);
 			// Meeting ends.
 			emptyConfRoom();		
-		} catch (BrokenBarrierException e) {
-			e.printStackTrace();
-		} catch(InterruptedException e){
+		} catch (InterruptedException | BrokenBarrierException e) {
 			e.printStackTrace();
 		}
 	}
@@ -103,10 +95,8 @@ public class Office {
 	public void waitForEndOfDayMeeting() {
 		try {
 			endOfDayMeeting.await();
-		} catch (BrokenBarrierException e) {
+		} catch (InterruptedException | BrokenBarrierException e) {
 			e.printStackTrace();
-		} catch(InterruptedException e){
-			
 		}
 	}
 	
@@ -129,7 +119,9 @@ public class Office {
 		this.leads[teamNumber] = lead;
 	}
 
-	
+	public CyclicBarrier[] getTeamMeetings(){
+		return teamMeetings;		
+	}
 	
 	
 	public synchronized void setEndOfDay(long time) {
@@ -147,20 +139,22 @@ public class Office {
 	public void fillConfRoom(int teamNumber) {
 		System.out.println("filling1");
 		synchronized(confRoomLock){
-			System.out.println("filling2");
 			confRoom = false;
 			confRoomUsedBy = teamNumber;
-			System.out.println("filling3");
+			System.out.println("Conference room accquired by team " + (int)(teamNumber+1));
 		}
-		System.out.println("filling4");
+		System.out.println("filled");
 	}
 	
 	public void emptyConfRoom() {
 		synchronized(confRoomLock){
 			confRoom = true;
 			confRoomUsedBy = -1;
+			System.out.println("Conference Room Released");
 		}
-		notifyAll();
+		synchronized(this){
+			notifyAll();
+		}
 	}
 	
 	public int getConfRoomUsedBy() {
