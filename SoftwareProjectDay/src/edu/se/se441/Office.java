@@ -21,18 +21,35 @@ public class Office {
 	// Capacity of conference room.
 	private int confRoom = 0;
 	private int confRoomUsedBy = -1;
-
+	
+	// Locks.
+	private Object workingLock = new Object();
 	private Object confRoomLock = new Object();
-	private long[] timeRegistry;
-	private int numEmployeesCheckedIn;
 	
 	public Office(Clock clock){
 		this.clock = clock;
-		timeRegistry = new long[12];
-		numEmployeesCheckedIn = 0;
 		
 		for(int i=0; i<teamMeetings.length; i++){
 			teamMeetings[i] = new CyclicBarrier(4);
+		}
+	}
+	
+	/**
+	 * Call when employee is doing nothing.
+	 */
+	public void startWorking(){
+		synchronized(workingLock){
+			try {
+				workingLock.wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void notifyWorking(){
+		synchronized(workingLock){
+			workingLock.notifyAll();
 		}
 	}
 	
@@ -76,7 +93,6 @@ public class Office {
 					} else {
 						//System.out.println(employee.getEmployeeName() + " stuck")
 						// Wait until the room is open.
-//						employee.wait();
 						confRoomLock.wait();
 					
 						//System.out.println(employee.getEmployeeName() + " Unstuck");
