@@ -48,16 +48,20 @@ public class Office {
 	public void waitForStandupMeeting(){
 		try {
 			standupMeeting.await();
-		} catch (InterruptedException | BrokenBarrierException e) {
-			e.printStackTrace();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		} catch (BrokenBarrierException e2) {
+			e2.printStackTrace();
 		}
 	}
 	
 	public void waitForTeamMeeting(int teamNumber){
 		try {
 			teamMeetings[teamNumber].await();
-		} catch (InterruptedException | BrokenBarrierException e) {
-			e.printStackTrace();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		} catch (BrokenBarrierException e2) {
+			e2.printStackTrace();
 		}
 	}
 	
@@ -87,16 +91,20 @@ public class Office {
 			Thread.sleep(150);
 			// Meeting ends.
 			emptyConfRoom();		
-		} catch (InterruptedException | BrokenBarrierException e) {
-			e.printStackTrace();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		} catch (BrokenBarrierException e2) {
+			e2.printStackTrace();
 		}
 	}
 
 	public void waitForEndOfDayMeeting() {
 		try {
 			endOfDayMeeting.await();
-		} catch (InterruptedException | BrokenBarrierException e) {
-			e.printStackTrace();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		} catch (BrokenBarrierException e2) {
+			e2.printStackTrace();
 		}
 	}
 	
