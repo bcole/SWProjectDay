@@ -26,7 +26,12 @@ public class Manager extends Thread {
 		try {
 			// Starting all threads at the same time (clock == 0 / "8:00AM").
 			startSignal.await();
-			System.out.println(office.getTime() + " Manager arrives at office");
+			Thread.yield();
+			if(office.getTime() == 800){
+				System.out.println(office.getStringTime() + " Manager arrives at office");
+			} else {
+				System.out.println("800 Manager arrives at office");
+			}
 			// Waiting for team leads for the meeting.
 			office.waitForStandupMeeting();
 			Thread.sleep(150);
@@ -35,6 +40,7 @@ public class Manager extends Thread {
 		}
 		
 		while(office.getTime() < 1700){
+			System.out.println(office.getStringTime() + " Starting while loop.");
 			office.startWorking();
 			
 			while(!hasQuestion.isEmpty()){
@@ -42,7 +48,7 @@ public class Manager extends Thread {
 			}
 			if(office.getTime() >= 1000 && !attendedMeeting1){
 				 try {
-					System.out.println(office.getTime() + " Manager goes to meeting");
+					System.out.println(office.getStringTime() + " Manager goes to meeting");
 					sleep(600);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -51,7 +57,7 @@ public class Manager extends Thread {
 			}
 			if(office.getTime() >= 1200 && !ateLunch){
 				try {
-					System.out.println(office.getTime() + " Manager goes to lunch");
+					System.out.println(office.getStringTime() + " Manager goes to lunch");
 					sleep(600);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -60,7 +66,7 @@ public class Manager extends Thread {
 			}
 			if(office.getTime() >= 1400 && !attendedMeeting2){
 				try {
-					System.out.println(office.getTime() + " Manager goes to meeting");
+					System.out.println(office.getStringTime() + " Manager goes to meeting");
 					sleep(600);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -72,7 +78,7 @@ public class Manager extends Thread {
 			if(office.getTime() >= 1600 && !attendedFinalMeeting){
 				office.waitForEndOfDayMeeting();
 				try {
-					System.out.println(office.getTime() + " Manager heads to end of day meeting");
+					System.out.println(office.getStringTime() + " Manager heads to end of day meeting");
 					sleep(150);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -80,7 +86,7 @@ public class Manager extends Thread {
 				attendedFinalMeeting = true;
 			}
 		}
-		System.out.println(office.getTime() + " Manager leaves");
+		System.out.println(office.getStringTime() + " Manager leaves");
 	}
 	
 	public void setStartSignal(CountDownLatch startSignal) {

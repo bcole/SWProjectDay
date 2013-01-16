@@ -25,9 +25,10 @@ public class Clock extends Thread{
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		startTime = System.currentTimeMillis();
 		Random r = new Random();
 		// Set the start time of the simulation.
-		startTime = System.currentTimeMillis();
+		System.out.println("CLOCK STARTED");
 		while(this.getTime() <= 5400){ //Simulation starts at 800 (time 0000) and ends at 1700 (time 5400).
 			synchronized(timeRegistry){
 				for(Long t : timeRegistry){
@@ -41,6 +42,7 @@ public class Clock extends Thread{
 				office.notifyWorking();
 			}	
 		}
+		System.out.println("CLOCK ENDED");
 	}
 	
 	/**
