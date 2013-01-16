@@ -54,10 +54,33 @@ public class Office {
 	}
 	
 	public long getTime(){
+		// system milliseconds
 		long time = clock.getTime();
+		
+		// simulation total minutes
 		time = time/10;
-		time += 800;
+		
+		// get simulation hours
+		int hours = (int) (time/60);
+		
+		// get just minutes (0<=minutes<60)
+		int minutes = (int) time%60;
+		
+		// put hours and minutes together
+		time = minutes + (hours * 100) + 800;
 		return time;
+	}
+	
+	public String getStringTime(){
+		long time = getTime();
+		
+		int hours = (int) (time/100);
+		hours = (hours>12) ? hours - 12 : hours;
+		
+		String minutes = Integer.toString((int) (time%100));
+		minutes = (Integer.parseInt(minutes) < 10) ? "0" + minutes : minutes;
+		
+		return hours + ":" + minutes;
 	}
 	
 	
@@ -100,6 +123,8 @@ public class Office {
 				}
 				
 			}
+			
+			confRoom++;
 			// Synchronize other team members to start the meeting at the same time.
 			teamMeetings[teamNumber].await();
 			
@@ -162,20 +187,19 @@ public class Office {
 	
 	public void fillConfRoom(int teamNumber) {
 		synchronized(confRoomLock){
-			confRoom++;
 			confRoomUsedBy = teamNumber;
-			System.out.println("Conference room accquired by team " + (int)(teamNumber+1));
+			System.out.println(getStringTime() + " Conference room accquired by team " + (int)(teamNumber+1));
 		}
 	}
 	
 	public void emptyConfRoom() {
 		synchronized(confRoomLock){
 			confRoom--;
-			confRoomUsedBy = -1;
 			
 			// Only let the last one out notifyAll.
 			if(confRoom == 0){
-				System.out.println("Conference Room Released");
+				confRoomUsedBy = -1;
+				System.out.println(getStringTime() + " Conference Room Released");
 				confRoomLock.notifyAll();
 			}
 		}

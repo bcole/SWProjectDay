@@ -37,10 +37,10 @@ public class Main {
 		
 		
 		// START THREADS
-		manager.start();
 		for(int i=0; i<NUM_OF_EMPLOYEES; i++){
 			employees[i].start();
 		}
+		manager.start();
 		clock.start();
 		// Countdown the latch to release the threads.
 		startSignal.countDown();

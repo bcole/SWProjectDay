@@ -44,7 +44,7 @@ public class Employee extends Thread {
 			Thread.sleep(10 * r.nextInt(30));
 			
 
-			System.out.println(office.getTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " arrives at office");
+			System.out.println(office.getStringTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " arrives at office");
 			dayStartTime = office.getTime();
 			dayEndTime = dayStartTime + 800;	// Work at least 8 hours
 			lunchTime = r.nextInt(200) + 1200;
@@ -56,7 +56,7 @@ public class Employee extends Thread {
 			// Waiting for team leads for the meeting.
 			if(isLead){
 				office.waitForStandupMeeting();
-				System.out.println(office.getTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " is at standup meeting");
+				System.out.println(office.getStringTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " is at standup meeting");
 				Thread.sleep(150);
 			}
 			
@@ -64,7 +64,7 @@ public class Employee extends Thread {
 			office.waitForTeamMeeting(teamNumber);
 			office.haveTeamMeeting(teamNumber, this);
 			
-			System.out.println(office.getTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " left team meeting");
+			System.out.println(office.getStringTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " left team meeting");
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -105,7 +105,7 @@ public class Employee extends Thread {
 			// Lunch time?
 			if(office.getTime() >= lunchTime && !hadLunch){
 				try {
-					System.out.println(office.getTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " goes to lunch");
+					System.out.println(office.getStringTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " goes to lunch");
 					sleep(lunchDuration*10);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -117,7 +117,7 @@ public class Employee extends Thread {
 			if(office.getTime() >= 1600 && !attendedEndOfDayMeeting){
 				office.waitForEndOfDayMeeting();
 				try {
-					System.out.println(office.getTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " attends end of day meeting");
+					System.out.println(office.getStringTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " attends end of day meeting");
 					sleep(150);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -125,7 +125,7 @@ public class Employee extends Thread {
 				attendedEndOfDayMeeting = true;
 			}
 		}
-		System.out.println(office.getTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " leaves");
+		System.out.println(office.getStringTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " leaves");
 	}
 	
 	// Only for Team Leaders, called when asked a question that needs to be passed up to manager.
