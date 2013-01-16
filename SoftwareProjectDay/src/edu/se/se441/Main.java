@@ -12,7 +12,7 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		System.out.println("Starting simulation");
+		System.out.println("Starting simulation...");
 		
 		// Create a latch that will start all the threads at the same time.
 		CountDownLatch startSignal = new CountDownLatch(1);
@@ -46,6 +46,18 @@ public class Main {
 		// Countdown the latch to release the threads.
 		startSignal.countDown();
 		
+		// Join the threads back together to end the simulation.
+		try {
+			clock.join();
+			manager.join();
+			for(int i=0; i<NUM_OF_EMPLOYEES; i++){
+				employees[i].join();
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		System.out.println("Ending simulation...");
 	}
 
 }
