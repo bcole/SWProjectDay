@@ -71,6 +71,23 @@ public class Office {
 		return time;
 	}
 	
+	/**
+	 * 
+	 * @param officeTime 800 to 1700
+	 * @return 0 to 5400
+	 */
+	private long officeTimeToClockTime(long officeTime){
+		officeTime -= 800;
+		int hours = (int) (officeTime/100);		// 0 to 9
+		int minutes = (int) (officeTime%100);	// 0 to 60
+		
+		// 0 to 540 minutes in the day
+		int totalMinutes = (hours * 60) + minutes;
+		
+		// Return milliseconds (0 to 5400 ms)
+		return totalMinutes * 10;
+	}
+	
 	public String getStringTime(){
 		long time = getTime();
 		
@@ -172,13 +189,13 @@ public class Office {
 		return teamMeetings;		
 	}
 	
-	
-	public synchronized void setEndOfDay(long time) {
-	    //timeRegistry[numEmployeesCheckedIn] = time;
-	    //numEmployeesCheckedIn++;
-		
-//		clock.addTimeEvent(time);
+	/**
+	 * @param time OfficeTime
+	 */
+	public synchronized void addTimeEvent(long time) {
+		clock.addTimeEvent(officeTimeToClockTime(time));
 	}
+	
 	public boolean confRoomOpen() {
 		synchronized(confRoomLock){
 			return confRoom==0;

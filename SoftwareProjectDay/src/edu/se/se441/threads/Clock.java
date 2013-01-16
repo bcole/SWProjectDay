@@ -1,5 +1,6 @@
 package edu.se.se441.threads;
 
+import java.util.Iterator;
 import java.util.Vector;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
@@ -31,14 +32,17 @@ public class Clock extends Thread{
 		System.out.println("CLOCK STARTED");
 		while(this.getTime() <= 5400){ //Simulation starts at 800 (time 0000) and ends at 1700 (time 5400).
 			synchronized(timeRegistry){
-				for(Long t : timeRegistry){
-					if(this.getTime() >= t){
+				Iterator<Long> iter = timeRegistry.iterator();
+				while(iter.hasNext()){
+					Long t = iter.next();
+					if(this.getTime() >= t && office != null){
+						iter.remove();
 						office.notifyWorking();
 					}
 				}
 			}
 			int random = r.nextInt(5);
-			if(random == 0){
+			if(random == 0 && office != null){
 				office.notifyWorking();
 			}	
 		}

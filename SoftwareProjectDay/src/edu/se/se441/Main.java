@@ -22,6 +22,7 @@ public class Main {
 		
 		// Create an office data object
 		Office office = new Office(clock);
+		clock.setOffice(office);
 		
 		// Create Manager
 		Manager manager = new Manager(office);

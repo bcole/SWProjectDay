@@ -8,7 +8,7 @@ import java.util.Random;
 import edu.se.se441.*;
 
 public class Employee extends Thread {
-	// Latches and Barries
+	// Latches and Barriers
 	private CountDownLatch startSignal;
 	
 	// Times
@@ -31,6 +31,7 @@ public class Employee extends Thread {
 		isWaitingQuestion = false;
 		this.teamNumber = teamNumber;
 		this.empNumber = empNumber;
+		if(isLead) office.setLead(teamNumber, this);
 	}
 
 	public void run(){
@@ -47,11 +48,12 @@ public class Employee extends Thread {
 			System.out.println(office.getStringTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " arrives at office");
 			dayStartTime = office.getTime();
 			dayEndTime = dayStartTime + 800;	// Work at least 8 hours
-			lunchTime = r.nextInt(200) + 1200;
+			lunchTime = r.nextInt(200) + 1200;	// Lunch starts between 12 and 2
 			lunchDuration = r.nextInt((int) (1700-dayEndTime-30)) + 30;	// Figure out lunch duration
-			dayEndTime += lunchDuration;	// Add to end time.
+			dayEndTime += lunchDuration;		// Add to end time.
 			
-			office.setEndOfDay(dayEndTime);
+			office.addTimeEvent(lunchTime);		// Lunch Time
+			office.addTimeEvent(dayEndTime);	// End of day
 			
 			// Waiting for team leads for the meeting.
 			if(isLead){
@@ -73,6 +75,10 @@ public class Employee extends Thread {
 		while(true){
 			// Wait until Employee should do something
 			office.startWorking();
+			
+			if(!runChecks()){
+				break;
+			}
 
 			// If Leader, and question, ask manager
 			if(isLead && isWaitingQuestion){
@@ -95,37 +101,47 @@ public class Employee extends Thread {
 				}
 			}
 			
-			
-			// Check 1: Is it time to go home?
-			if(office.getTime() >= dayEndTime){
-				// End the thread
+			if(!runChecks()){
 				break;
-			}
-			
-			// Lunch time?
-			if(office.getTime() >= lunchTime && !hadLunch){
-				try {
-					System.out.println(office.getStringTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " goes to lunch");
-					sleep(lunchDuration*10);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				hadLunch = true;
-			}
-			
-			// Is it time for the 4 oclock meeting?
-			if(office.getTime() >= 1600 && !attendedEndOfDayMeeting){
-				office.waitForEndOfDayMeeting();
-				try {
-					System.out.println(office.getStringTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " attends end of day meeting");
-					sleep(150);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				attendedEndOfDayMeeting = true;
 			}
 		}
 		System.out.println(office.getStringTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " leaves");
+	}
+	
+	/**
+	 * @return if false, break;
+	 */
+	private boolean runChecks(){
+		// Check 1: Is it time to go home?
+		if(office.getTime() >= dayEndTime){
+			// End the thread
+			return false;
+		}
+		
+		// Lunch time?
+		if(office.getTime() >= lunchTime && !hadLunch){
+			try {
+				System.out.println(office.getStringTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " goes to lunch");
+				sleep(lunchDuration*10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			hadLunch = true;
+		}
+		
+		// Is it time for the 4 oclock meeting?
+		if(office.getTime() >= 1600 && !attendedEndOfDayMeeting){
+			office.waitForEndOfDayMeeting();
+			try {
+				System.out.println(office.getStringTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " attends end of day meeting");
+				sleep(150);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			attendedEndOfDayMeeting = true;
+		}
+		
+		return true;
 	}
 	
 	// Only for Team Leaders, called when asked a question that needs to be passed up to manager.

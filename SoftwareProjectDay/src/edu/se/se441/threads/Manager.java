@@ -20,6 +20,7 @@ public class Manager extends Thread {
 	
 	public Manager(Office office){
 		this.office = office;
+		office.setManager(this);
 	}
 	
 	public void run(){
@@ -39,8 +40,13 @@ public class Manager extends Thread {
 			e.printStackTrace();
 		}
 		
+		office.addTimeEvent(1000);	// 10AM Meeting
+		office.addTimeEvent(1200);	// Lunch Time
+		office.addTimeEvent(1200);	// 2PM Meeting
+		office.addTimeEvent(1600);	// 4PM Meeting
+		
 		while(office.getTime() < 1700){
-			System.out.println(office.getStringTime() + " Starting while loop.");
+//			System.out.println(office.getStringTime() + " Starting while loop.");
 			office.startWorking();
 			
 			while(!hasQuestion.isEmpty()){
@@ -144,7 +150,9 @@ public class Manager extends Thread {
 		}
 		
 		try {
+			System.out.println(office.getStringTime() + " Manager starts answering question.  Queue depth: " + hasQuestion.size());
 			sleep(100);
+			System.out.println(office.getStringTime() + " Manager ends answering question.  Queue depth: " + hasQuestion.size());
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
