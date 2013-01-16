@@ -103,7 +103,10 @@ public class Manager extends Thread {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			 attendedMeeting1 = true;
+			attendedMeeting1 = true;
+			synchronized(questionLock){
+				questionLock.notifyAll();
+			}
 		}
 		if(office.getTime() >= 1200 && !ateLunch){
 			try {
@@ -118,6 +121,9 @@ public class Manager extends Thread {
 				e.printStackTrace();
 			}				
 			ateLunch = true;
+			synchronized(questionLock){
+				questionLock.notifyAll();
+			}
 		}
 		if(office.getTime() >= 1400 && !attendedMeeting2){
 			try {
@@ -132,6 +138,9 @@ public class Manager extends Thread {
 				e.printStackTrace();
 			}
 			attendedMeeting2 = true;
+			synchronized(questionLock){
+				questionLock.notifyAll();
+			}
 		}
 		
 		// Is it time for the 4 oclock meeting?
@@ -149,6 +158,9 @@ public class Manager extends Thread {
 				e.printStackTrace();
 			}
 			attendedFinalMeeting = true;
+			synchronized(questionLock){
+				questionLock.notifyAll();
+			}
 		}
 	}
 	

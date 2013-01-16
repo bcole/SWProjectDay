@@ -56,6 +56,7 @@ public class Office {
 	public long getTime(){
 		// system milliseconds
 		long time = clock.getTime();
+		if(clock.getTime() > 6000) time = 0;	// fix minor thread bug
 		
 		// simulation total minutes
 		time = time/10;
