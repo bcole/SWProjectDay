@@ -101,7 +101,6 @@ public class Office {
 				
 			}
 			// Synchronize other team members to start the meeting at the same time.
-			System.out.println(employee.getEmployeeName() +" waiting for team meeting to start.");
 			teamMeetings[teamNumber].await();
 			
 			// Meeting starts.
@@ -162,23 +161,23 @@ public class Office {
 	}
 	
 	public void fillConfRoom(int teamNumber) {
-		System.out.println("filling1");
 		synchronized(confRoomLock){
 			confRoom++;
 			confRoomUsedBy = teamNumber;
 			System.out.println("Conference room accquired by team " + (int)(teamNumber+1));
 		}
-		System.out.println("filled");
 	}
 	
 	public void emptyConfRoom() {
 		synchronized(confRoomLock){
 			confRoom--;
 			confRoomUsedBy = -1;
-			System.out.println("Conference Room Released");
 			
 			// Only let the last one out notifyAll.
-			if(confRoom == 0) confRoomLock.notifyAll();
+			if(confRoom == 0){
+				System.out.println("Conference Room Released");
+				confRoomLock.notifyAll();
+			}
 		}
 	}
 	
