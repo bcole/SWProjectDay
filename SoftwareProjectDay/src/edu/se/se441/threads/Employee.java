@@ -15,12 +15,12 @@ public class Employee extends Thread {
 	private long dayStartTime, dayEndTime, lunchTime, lunchDuration;
 	
 	// Meeting attended Booleans
-	private boolean attendedEndOfDayMeeting;
+	private volatile boolean attendedEndOfDayMeeting;
 	private Object leadQLock = new Object();
 	private int teamNumber, empNumber;
 	private boolean isLead;
-	private boolean isWaitingQuestion;
-	private boolean hadLunch;
+	private volatile boolean isWaitingQuestion;
+	private volatile boolean hadLunch;
 	private Office office;
 
 	
@@ -150,9 +150,10 @@ public class Employee extends Thread {
 		try {
 			synchronized(leadQLock){
 				// Leader already has a question that hasn't been answered.
-				while(teamLeader.isWaitingQuestion){
+				while(teamLeader.isWaitingQuestion()){
 					leadQLock.wait();
 				}
+				if(office.getTime() < 1700) return;
 				
 				// Set our question.
 				teamLeader.getsQuestion();
@@ -161,7 +162,7 @@ public class Employee extends Thread {
 
 			synchronized(office.getManager().getQuestionLock()){
 				// Is the manager answering the question
-				while(teamLeader.isWaitingQuestion){
+				while(teamLeader.isWaitingQuestion()){
 					if(office.getTime() >= 1600 && !attendedEndOfDayMeeting){
 						office.waitForEndOfDayMeeting();
 						sleep(150);
