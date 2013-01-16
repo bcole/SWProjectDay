@@ -24,6 +24,12 @@ public class Manager extends Thread {
 	}
 	
 	public void run(){
+		office.addTimeEvent(1000);	// 10AM Meeting
+		office.addTimeEvent(1200);	// Lunch Time
+		office.addTimeEvent(1200);	// 2PM Meeting
+		office.addTimeEvent(1600);	// 4PM Meeting
+		office.addTimeEvent(1700);	// 5PM end of day
+		
 		try {
 			// Starting all threads at the same time (clock == 0 / "8:00AM").
 			startSignal.await();
@@ -40,15 +46,9 @@ public class Manager extends Thread {
 			e.printStackTrace();
 		}
 		
-		office.addTimeEvent(1000);	// 10AM Meeting
-		office.addTimeEvent(1200);	// Lunch Time
-		office.addTimeEvent(1200);	// 2PM Meeting
-		office.addTimeEvent(1600);	// 4PM Meeting
-		
 		while(office.getTime() < 1700){
 //			System.out.println(office.getStringTime() + " Starting while loop.");
 			office.startWorking();
-			
 			while(!hasQuestion.isEmpty()){
 				answerQuestion();
 			}
@@ -111,7 +111,9 @@ public class Manager extends Thread {
 				// Is it time for the 4 o'clock meeting?
 				try {
 					if(office.getTime() >= 1600 && !employee.isAttendedEndOfDayMeeting()){
+						System.out.println("Starting end of day meeting.");
 						office.waitForEndOfDayMeeting();
+						System.out.println("Everyone is ready for end of day meeting.");
 						sleep(150);
 						employee.setAttendedEndOfDayMeeting(true);
 					}
