@@ -13,6 +13,8 @@ public class Clock extends Thread{
 	private long startTime;	// When the simulation starts.
 	private Vector<Long> timeRegistry;
 	private Office office;
+	private int millisTime;
+	private long currentMillisTime;
 	
 	public Clock(CountDownLatch startSignal){
 		this.startSignal = startSignal;
@@ -32,6 +34,7 @@ public class Clock extends Thread{
 		System.out.println("CLOCK STARTED");
 		int numOfQuestions = 0;
 		while(this.getTime() <= 5400){ //Simulation starts at 800 (time 0000) and ends at 1700 (time 5400).
+			currentMillisTime = System.currentTimeMillis();
 			synchronized(timeRegistry){
 				Iterator<Long> iter = timeRegistry.iterator();
 				while(iter.hasNext()){
@@ -42,11 +45,14 @@ public class Clock extends Thread{
 					}
 				}
 			}
-			int random = r.nextInt(100000);
-			if(random == 0 && office != null){	// Firing random questions.
+			if(currentMillisTime + 1 >= System.currentTimeMillis()){
 				numOfQuestions++;
-				office.notifyWorking();
-			}	
+				int random = r.nextInt(100000);
+				if(random == 0 && office != null){	// Firing random questions.
+					numOfQuestions++;
+					office.notifyWorking();
+				}	
+			}
 		}
 		System.out.println(numOfQuestions);
 		System.out.println("CLOCK ENDED");
