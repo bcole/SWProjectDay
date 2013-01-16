@@ -38,7 +38,7 @@ public class Clock extends Thread{
 	Random r = new Random();
 	System.out.println("CLOCK STARTED");
 	int numOfQuestions = 0;
-	while(this.getTime() <= 6400){ //Simulation starts at 800 (time 0000) and ends at 1700 (time 5400).
+	while(this.getTime() <= 5400){ //Simulation starts at 800 (time 0000) and ends at 1700 (time 5400).
 	    synchronized(timeRegistry){
 		Iterator<Long> iter = timeRegistry.iterator();
 		while(iter.hasNext()){
@@ -49,7 +49,7 @@ public class Clock extends Thread{
 		    }
 		}
 	    }
-	    int random = r.nextInt(500000);
+	    int random = r.nextInt(5000000);
 	    if(random == 0 && office != null){	// Firing random questions.
 		numOfQuestions++;
 		office.notifyWorking();

@@ -188,13 +188,16 @@ public class Employee extends Thread {
 			e.printStackTrace();
 		    }
 		    hadLunch = true;
+		    synchronized(leadQLock){
+		    	leadQLock.notifyAll();
+		    }
 		}
 	
 		// Is it time for the 4 oclock meeting?
 		if(office.getTime() >= 1600 && !attendedEndOfDayMeeting){
 		    long startCheck = System.currentTimeMillis();
 		    synchronized (leadQLock){
-			leadQLock.notifyAll();
+		    	leadQLock.notifyAll();
 		    }
 		    office.waitForEndOfDayMeeting();
 		    try {
@@ -241,10 +244,13 @@ public class Employee extends Thread {
 				    leadQLock.wait();
 				}
 		    }
-			if(office.getTime() > 1700 || !office.getLead(teamNumber).atWork || office.getLead(teamNumber).dayEndTime <= office.getTime()) return;
+			if(office.getTime() > 1700 || !office.getLead(teamNumber).atWork || office.getLead(teamNumber).dayEndTime <= office.getTime()){
+				System.out.println(office.getStringTime() + " Developer " + asker.getEmployeeName() + " drops question because team lead left");
+				return;
+			}
 					
 			 // Set our question.
-	
+			Thread.yield();
 			//System.out.println("Developer " + asker.getEmployeeName() + " notifies of a question");
 			teamLeader.getsQuestion();
 			office.notifyWorking();
@@ -305,15 +311,21 @@ public class Employee extends Thread {
     }
 
     public void getsQuestion(){
-    	isWaitingQuestion = true;
+    	synchronized(getLeadQLock()){
+    		isWaitingQuestion = true;
+    	}
     }
 
     public void questionAnswered(){
-    	isWaitingQuestion = false;
+    	synchronized(getLeadQLock()){
+    		isWaitingQuestion = false;
+    	}
     }
 
     public boolean isWaitingQuestion() {
-    	return isWaitingQuestion;
+    	synchronized(getLeadQLock()){
+    		return isWaitingQuestion;
+    	}
     }
 
     public boolean isAttendedEndOfDayMeeting() {
