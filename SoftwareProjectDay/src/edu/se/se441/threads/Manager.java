@@ -1,10 +1,6 @@
 package edu.se.se441.threads;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.*;
 
 import edu.se.se441.Office;
 
@@ -19,6 +15,7 @@ public class Manager extends Thread {
 	private boolean attendedMeeting2 = false;
 	private boolean ateLunch = false;
 	private boolean attendedFinalMeeting = false;
+	private Object questionLock = new Object();
 
 	
 	public Manager(Office office){
@@ -102,26 +99,28 @@ public class Manager extends Thread {
 		}
 		
 		// Waiting until question can be answered
-		while(hasQuestion.contains(employee)){
-			// Is it time for the 4 oclock meeting?
-			try {
-				if(office.getTime() >= 1600 && !employee.isAttendedEndOfDayMeeting()){
-					office.waitForEndOfDayMeeting();
-					sleep(150);
-					employee.setAttendedEndOfDayMeeting(true);
+		synchronized(questionLock){
+			while(hasQuestion.contains(employee)){
+				// Is it time for the 4 o'clock meeting?
+				try {
+					if(office.getTime() >= 1600 && !employee.isAttendedEndOfDayMeeting()){
+						office.waitForEndOfDayMeeting();
+						sleep(150);
+						employee.setAttendedEndOfDayMeeting(true);
+					}
+					wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
-				wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
 			}
-		}
-		
-		// Question is being answered
-		while(employee.isWaitingQuestion()){
-			try {
-				wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			
+			// Question is being answered
+			while(employee.isWaitingQuestion()){
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}
@@ -130,9 +129,13 @@ public class Manager extends Thread {
 		return hasQuestion.contains(lead);
 	}
 	
+	public Object getQuestionLock(){
+		return questionLock;
+	}
+	
 	private void answerQuestion(){
 		Employee employee = hasQuestion.poll();
-		notifyAll();
+		questionLock.notifyAll();
 		try {
 			sleep(100);
 		} catch (InterruptedException e) {
@@ -140,7 +143,7 @@ public class Manager extends Thread {
 		}
 		
 		employee.questionAnswered();
-		notifyAll();
+		questionLock.notifyAll();
 	}
 
 }
