@@ -187,7 +187,6 @@ public class Manager extends Thread {
 		}
 		
 		// Waiting until question can be answered
-		synchronized(questionLock){
 			while(hasQuestion.contains(employee)){
 				// Is it time for the 4 o'clock meeting?
 				try {
@@ -197,15 +196,16 @@ public class Manager extends Thread {
 						sleep(150);
 						employee.setAttendedEndOfDayMeeting(true);
 					}
-					
-					// Tell the Manager there is a question.
-					office.notifyWorking();
-					questionLock.wait();
-				} catch (InterruptedException e) {
+					synchronized(questionLock){
+						// Tell the Manager there is a question.
+						office.notifyWorking();
+						questionLock.wait();
+					}
+				}catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
-			
+			synchronized(questionLock){
 			// Question is being answered
 			while(employee.isWaitingQuestion()){
 				try {
