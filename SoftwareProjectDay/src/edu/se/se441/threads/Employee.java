@@ -16,7 +16,7 @@ public class Employee extends Thread {
 	
 	// Meeting attended Booleans
 	private boolean attendedEndOfDayMeeting;
-	
+	private Object leadQLock = new Object();
 	private int teamNumber, empNumber;
 	private boolean isLead;
 	private boolean isWaitingQuestion;
@@ -135,42 +135,40 @@ public class Employee extends Thread {
 	public void askQuestion(Employee asker){
 		Employee teamLeader = office.getLead(teamNumber);
 		try {
-			//TODO add synchronized block.
-			// Leader already has a question that hasn't been answered.
-			while(teamLeader.isWaitingQuestion){
-				wait();
-			}
-			
-			// Set our question.
-			teamLeader.getsQuestion();
-			notifyAll();
-			
-			
-			while(teamLeader.isWaitingQuestion){
-				wait();
-			}
-			
-			
-			
-			
-			// Is the manager answering the question
-			while(office.getManager().isLeadAsking(teamLeader)){
-				if(office.getTime() >= 1600 && !attendedEndOfDayMeeting){
-					office.waitForEndOfDayMeeting();
-					sleep(150);
-					attendedEndOfDayMeeting = true;
+			synchronized(leadQLock){
+				// Leader already has a question that hasn't been answered.
+				while(teamLeader.isWaitingQuestion){
+					wait();
 				}
-				wait();
+				
+				// Set our question.
+				teamLeader.getsQuestion();
+				notifyAll();
+			}
+
+			synchronized(office.getManager().getQuestionLock()){
+				while(teamLeader.isWaitingQuestion){
+					wait();
+				}
+				// Is the manager answering the question
+				while(office.getManager().isLeadAsking(teamLeader)){
+					if(office.getTime() >= 1600 && !attendedEndOfDayMeeting){
+						office.waitForEndOfDayMeeting();
+						sleep(150);
+						attendedEndOfDayMeeting = true;
+					}
+					wait();
+				}
+			
+				
+			}
+			synchronized(leadQLock){
+				teamLeader.questionAnswered();
+				notifyAll();
 			}
 		}catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		try {
-			sleep(100);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		teamLeader.questionAnswered();
 	}
 	
 	public void setStartSignal(CountDownLatch startSignal) {
