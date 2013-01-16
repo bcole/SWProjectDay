@@ -13,9 +13,10 @@ public class Clock extends Thread{
 	private ArrayList<Long> timeRegistry;
 	private Office office;
 	
-	public Clock(CountDownLatch startSignal){
+	public Clock(CountDownLatch startSignal, Office office){
 		this.startSignal = startSignal;
 		timeRegistry = new ArrayList<Long>();
+		this.office = office
 	}
 	
 	public void run(){
