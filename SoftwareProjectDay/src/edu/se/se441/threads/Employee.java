@@ -48,8 +48,8 @@ public class Employee extends Thread {
 			System.out.println(office.getStringTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " arrives at office");
 			dayStartTime = office.getTime();
 			dayEndTime = dayStartTime + 800;	// Work at least 8 hours
-			lunchTime = r.nextInt(200) + 1200;	// Lunch starts between 12 and 2
-			lunchDuration = r.nextInt((int) (1700-dayEndTime-30)) + 30;	// Figure out lunch duration
+			lunchTime = r.nextInt(60) + 1200 + r.nextInt(2)*100;	// Lunch starts between 12 and 2
+			lunchDuration = r.nextInt((int)(1700-dayEndTime-70)) + 30;	// Figure out lunch duration
 			dayEndTime += lunchDuration;		// Add to end time.
 			
 			office.addTimeEvent(lunchTime);		// Lunch Time
