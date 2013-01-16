@@ -34,6 +34,7 @@ public class Employee extends Thread {
 	}
 
 	public void run(){
+		this.setName(getEmployeeName());
 		Random r = new Random();
 		try {
 			// Starting all threads at the same time (clock == 0 / "8:00AM").
@@ -63,7 +64,7 @@ public class Employee extends Thread {
 			office.waitForTeamMeeting(teamNumber);
 			office.haveTeamMeeting(teamNumber, this);
 			
-			System.out.println(office.getTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " has team meeting");
+			System.out.println(office.getTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " left team meeting");
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -71,7 +72,9 @@ public class Employee extends Thread {
 		// Start main while loop here.
 		while(true){
 			try {
-				wait();
+				synchronized(this){
+					wait();
+				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

@@ -18,7 +18,8 @@ public class Office {
 	private Manager manager;
 	private Employee[] leads = new Employee[3];
 	
-	private boolean confRoom;
+	// Capacity of conference room.
+	private int confRoom = 0;
 	private int confRoomUsedBy = -1;
 
 	private Object confRoomLock = new Object();
@@ -27,7 +28,6 @@ public class Office {
 	
 	public Office(Clock clock){
 		this.clock = clock;
-		confRoom = true;
 		timeRegistry = new long[12];
 		numEmployeesCheckedIn = 0;
 		
@@ -67,7 +67,7 @@ public class Office {
 	
 	public void haveTeamMeeting(int teamNumber, Employee employee) {
 		try {
-			synchronized(employee){
+			synchronized(confRoomLock){
 				while(getConfRoomUsedBy() != teamNumber){
 					if(confRoomOpen()){
 						// Fill the room.
@@ -76,7 +76,8 @@ public class Office {
 					} else {
 						//System.out.println(employee.getEmployeeName() + " stuck")
 						// Wait until the room is open.
-						employee.wait();
+//						employee.wait();
+						confRoomLock.wait();
 					
 						//System.out.println(employee.getEmployeeName() + " Unstuck");
 					}
@@ -140,14 +141,14 @@ public class Office {
 	}
 	public boolean confRoomOpen() {
 		synchronized(confRoomLock){
-			return confRoom;
+			return confRoom==0;
 		}
 	}
 	
 	public void fillConfRoom(int teamNumber) {
 		System.out.println("filling1");
 		synchronized(confRoomLock){
-			confRoom = false;
+			confRoom++;
 			confRoomUsedBy = teamNumber;
 			System.out.println("Conference room accquired by team " + (int)(teamNumber+1));
 		}
@@ -156,12 +157,12 @@ public class Office {
 	
 	public void emptyConfRoom() {
 		synchronized(confRoomLock){
-			confRoom = true;
+			confRoom--;
 			confRoomUsedBy = -1;
 			System.out.println("Conference Room Released");
-		}
-		synchronized(this){
-			notifyAll();
+			
+			// Only let the last one out notifyAll.
+			if(confRoom == 0) confRoomLock.notifyAll();
 		}
 	}
 	
