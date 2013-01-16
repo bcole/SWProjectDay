@@ -200,7 +200,7 @@ public class Manager extends Thread {
 		}
 	    }
 	    //Wait for the end of the day meeting to start
-	    System.out.println("Manager is waiting for end of day meeting");
+	    //System.out.println("Manager is waiting for end of day meeting");
 	    office.waitForEndOfDayMeeting();
 	    try {
 		long startCheck = System.currentTimeMillis();				
@@ -227,40 +227,49 @@ public class Manager extends Thread {
      * @param employee the Employee to assist
      */
     public void askQuestion(Employee employee){
-	// Add question to queue
-	synchronized(hasQuestion){
-	    hasQuestion.add(employee);
-	}
-
-	// Waiting until question can be answered
-	while(hasQuestion.contains(employee)){
-	    // Is it time for the 4 o'clock meeting?
-	    try {
-		if(office.getTime() >= 1600 && !employee.isAttendedEndOfDayMeeting()){
-		    office.waitForEndOfDayMeeting();
-		    System.out.println(office.getStringTime() + " Developer " + employee.getEmployeeName() + " attends end of day meeting");
-		    sleep(150);
-		    employee.setAttendedEndOfDayMeeting(true);
+		// Add question to queue
+    	long startCheck = System.currentTimeMillis();
+    	
+		synchronized(hasQuestion){
+		    hasQuestion.add(employee);
 		}
+		
+		// Waiting until question can be answered
+		while(hasQuestion.contains(employee)){
+		    // Is it time for the 4 o'clock meeting?
+		    try {
+				if(office.getTime() >= 1600 && !employee.isAttendedEndOfDayMeeting()){
+				    office.waitForEndOfDayMeeting();
+				    System.out.println(office.getStringTime() + " Developer " + employee.getEmployeeName() + " attends end of day meeting");
+				    sleep(150);
+				    employee.setAttendedEndOfDayMeeting(true);
+				}
+				synchronized(questionLock){
+				    // Tell the Manager there is a question.
+				    office.notifyWorking();
+				    questionLock.wait();
+				}
+		    }catch (InterruptedException e) {
+		    	e.printStackTrace();
+		    }
+		}
+		
 		synchronized(questionLock){
-		    // Tell the Manager there is a question.
-		    office.notifyWorking();
-		    questionLock.wait();
+		    // Question is being answered
+		    while(employee.isWaitingQuestion()){
+				try {
+				    questionLock.wait();
+				} catch (InterruptedException e) {
+				    e.printStackTrace();
+				}
+		    }
 		}
-	    }catch (InterruptedException e) {
-		e.printStackTrace();
-	    }
-	}
-	synchronized(questionLock){
-	    // Question is being answered
-	    while(employee.isWaitingQuestion()){
-		try {
-		    questionLock.wait();
-		} catch (InterruptedException e) {
-		    e.printStackTrace();
-		}
-	    }
-	}
+		
+		long endCheck = System.currentTimeMillis();
+		
+		employee.addToWaitingQuestion((endCheck - startCheck)/10);
+
+		System.out.println(office.getStringTime() + " Developer " + employee.getEmployeeName() + "'s question is answered");
     }
 
     /**
@@ -285,18 +294,19 @@ public class Manager extends Thread {
      */
     private void answerQuestion(){
 	//Gets the top question from the queue
-	Employee employee = hasQuestion.poll();
+	Employee employee;
 	//If it's still before closing time
 	if(office.getTime() < 1700){
 	    //Notify that a question is being answered
 	    synchronized(questionLock){
+	    employee = hasQuestion.poll();
 		questionLock.notifyAll();
 	    }
 	    //Answer the question
 	    try {
-		System.out.println(office.getStringTime() + " Manager starts answering question from Developer" + employee.getEmployeeName() +  ".");
+		System.out.println(office.getStringTime() + " Manager starts answering question from Developer " + employee.getEmployeeName() +  ".");
 		sleep(100);
-		System.out.println(office.getStringTime() + " Manager ends answering question.");
+		System.out.println(office.getStringTime() + " Manager answers question.");
 	    } catch (InterruptedException e) {
 		e.printStackTrace();
 	    }
