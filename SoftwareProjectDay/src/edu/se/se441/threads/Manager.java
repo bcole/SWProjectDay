@@ -78,7 +78,7 @@ public class Manager extends Thread {
 		System.out.println(office.getStringTime() + " Manager leaves");
 		
 		System.out.println("Manager report: a) " + timeSpentWorking + " b) " + timeSpentAtLunch +
-				" c) " + timeSpentInMeetings + " c) " + timeSpentAnsweringQuestions);
+				" c) " + timeSpentInMeetings + " d) " + timeSpentAnsweringQuestions);
 	}
 	
 	public void setStartSignal(CountDownLatch startSignal) {
