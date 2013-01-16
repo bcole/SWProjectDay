@@ -166,8 +166,8 @@ public class Office {
 	try {
 	    //We wait for the conference room to be open or contain our team
 	    synchronized(confRoomLock){
-		System.out.println("Employee " + employee.getName() + "wants the room");
-		System.out.println("The room is used by " + getConfRoomUsedBy());
+		//System.out.println("Employee " + employee.getName() + "wants the room");
+		//System.out.println("The room is used by " + getConfRoomUsedBy());
 		while(getConfRoomUsedBy() != teamNumber){
 		    if(confRoomOpen()){
 			// Fill the room.
