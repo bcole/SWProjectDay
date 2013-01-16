@@ -13,10 +13,9 @@ public class Clock extends Thread{
 	private ArrayList<Long> timeRegistry;
 	private Office office;
 	
-	public Clock(CountDownLatch startSignal, Office office){
+	public Clock(CountDownLatch startSignal){
 		this.startSignal = startSignal;
 		timeRegistry = new ArrayList<Long>();
-		this.office = office
 	}
 	
 	public void run(){
@@ -33,11 +32,11 @@ public class Clock extends Thread{
 			for(Long t : timeRegistry){
 				int random = r.nextInt(5);
 				if(this.getTime() >= t){
-					o.notifyWorking();
+					office.notifyWorking();
 				}
 				else{
 					if(random == 0){
-						o.notifyWorking();
+						office.notifyWorking();
 					}
 				}
 				
@@ -54,5 +53,8 @@ public class Clock extends Thread{
 
 	public void addTimeEvent(long timeOfEvent){
 		timeRegistry.add(timeOfEvent);
+	}
+	public void setOffice(Office o){
+		office = o;
 	}
 }
