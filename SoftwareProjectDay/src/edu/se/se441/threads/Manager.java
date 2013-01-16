@@ -126,7 +126,7 @@ public class Manager extends Thread {
 				sleep(600);
 				long endCheck = System.currentTimeMillis();
 				
-				timeSpentAtLunch += (endCheck - startCheck)/10;
+				timeSpentInMeetings += (endCheck - startCheck)/10;
 				
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -143,7 +143,7 @@ public class Manager extends Thread {
 				sleep(150);
 				long endCheck = System.currentTimeMillis();
 
-				timeSpentAtLunch += (endCheck - startCheck)/10;
+				timeSpentInMeetings += (endCheck - startCheck)/10;
 				
 			} catch (InterruptedException e) {
 				e.printStackTrace();
