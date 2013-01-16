@@ -1,6 +1,6 @@
 package edu.se.se441.threads;
 
-import java.util.ArrayList;
+import java.util.Vector;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
@@ -10,12 +10,12 @@ public class Clock extends Thread{
 	
 	private CountDownLatch startSignal;
 	private long startTime;	// When the simulation starts.
-	private ArrayList<Long> timeRegistry;
+	private Vector<Long> timeRegistry;
 	private Office office;
 	
 	public Clock(CountDownLatch startSignal){
 		this.startSignal = startSignal;
-		timeRegistry = new ArrayList<Long>();
+		timeRegistry = new Vector<Long>();
 	}
 	
 	public void run(){
@@ -29,18 +29,17 @@ public class Clock extends Thread{
 		// Set the start time of the simulation.
 		startTime = System.currentTimeMillis();
 		while(this.getTime() <= 5400){ //Simulation starts at 800 (time 0000) and ends at 1700 (time 5400).
-			for(Long t : timeRegistry){
-				int random = r.nextInt(5);
-				if(this.getTime() >= t){
-					office.notifyWorking();
-				}
-				else{
-					if(random == 0){
+			synchronized(timeRegistry){
+				for(Long t : timeRegistry){
+					if(this.getTime() >= t){
 						office.notifyWorking();
 					}
 				}
-				
 			}
+			int random = r.nextInt(5);
+			if(random == 0){
+				office.notifyWorking();
+			}	
 		}
 	}
 	
@@ -52,7 +51,9 @@ public class Clock extends Thread{
 	}
 
 	public void addTimeEvent(long timeOfEvent){
-		timeRegistry.add(timeOfEvent);
+		synchronized(timeRegistry){
+			timeRegistry.add(timeOfEvent);
+		}
 	}
 	public void setOffice(Office o){
 		office = o;
