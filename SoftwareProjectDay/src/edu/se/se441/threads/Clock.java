@@ -33,8 +33,8 @@ public class Clock extends Thread{
 		// Set the start time of the simulation.
 		System.out.println("CLOCK STARTED");
 		int numOfQuestions = 0;
+		currentMillisTime = System.currentTimeMillis();
 		while(this.getTime() <= 5400){ //Simulation starts at 800 (time 0000) and ends at 1700 (time 5400).
-			currentMillisTime = System.currentTimeMillis();
 			synchronized(timeRegistry){
 				Iterator<Long> iter = timeRegistry.iterator();
 				while(iter.hasNext()){
@@ -46,6 +46,7 @@ public class Clock extends Thread{
 				}
 			}
 			if(currentMillisTime + 1 >= System.currentTimeMillis()){
+				currentMillisTime = System.currentTimeMillis();
 				numOfQuestions++;
 				int random = r.nextInt(100000);
 				if(random == 0 && office != null){	// Firing random questions.
