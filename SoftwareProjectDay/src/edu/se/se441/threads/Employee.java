@@ -89,7 +89,7 @@ public class Employee extends Thread {
 		}
 		
 		// Start main while loop here.
-		while(true){
+		while(office.getTime() < 1700){
 			// Wait until Employee should do something
 			long startCheck = System.currentTimeMillis();
 			office.startWorking();
@@ -103,6 +103,7 @@ public class Employee extends Thread {
 
 			// If Leader, and question, ask manager
 			if(isLead && isWaitingQuestion){
+				System.out.println(office.getStringTime() + " Developer " + getEmployeeName() + " passes the question to the Manager.");
 				office.getManager().askQuestion(this);
 			}
 			
@@ -112,12 +113,16 @@ public class Employee extends Thread {
 			if(random == 0){
 				//Team lead asking a question
 				if(isLead){
+					System.out.println(office.getStringTime() + " Developer " + getEmployeeName() + " asks Manager a question.");
 					office.getManager().askQuestion(this);
 				}
 				//Employee asking a question
 				else{
 					if(r.nextBoolean()){
+						System.out.println(office.getStringTime() + " Developer " + getEmployeeName() + " asks Team Lead a question (doesn't have answer).");
 						office.getLead(teamNumber).askQuestion(this);						
+					} else {
+						System.out.println(office.getStringTime() + " Developer " + getEmployeeName() + " asks Team Lead a question (has answer).");
 					}
 				}
 			}
@@ -187,14 +192,14 @@ public class Employee extends Thread {
 				while(teamLeader.isWaitingQuestion()){
 					leadQLock.wait();
 				}
-				if(office.getTime() < 1700) return;
+				if(office.getTime() > 1700) return;
 				
 				// Set our question.
 				teamLeader.getsQuestion();
 				office.notifyWorking();
 				long endTime = System.currentTimeMillis();
 				
-				timeSpentWaitingForAnswers =+ (endTime - startTime)/10;
+				timeSpentWaitingForAnswers += (endTime - startTime)/10;
 			}
 
 			synchronized(office.getManager().getQuestionLock()){
@@ -216,7 +221,7 @@ public class Employee extends Thread {
 					office.getManager().getQuestionLock().wait();
 					long endTime = System.currentTimeMillis();
 					
-					timeSpentWaitingForAnswers =+ (endTime - startTime)/10;
+					timeSpentWaitingForAnswers += (endTime - startTime)/10;
 					
 				}
 			
@@ -231,7 +236,7 @@ public class Employee extends Thread {
 
 			long endTime = System.currentTimeMillis();
 
-			timeSpentWaitingForAnswers =+ (endTime - startTime)/10;
+			timeSpentWaitingForAnswers += (endTime - startTime)/10;
 			
 		}catch (InterruptedException e) {
 			e.printStackTrace();

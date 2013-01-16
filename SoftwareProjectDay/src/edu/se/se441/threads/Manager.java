@@ -10,7 +10,7 @@ public class Manager extends Thread {
 	
 	private Office office;
 	private CountDownLatch startSignal;
-	private BlockingQueue<Employee> hasQuestion = new ArrayBlockingQueue<Employee>(NUMQUESTIONS);
+	private volatile BlockingQueue<Employee> hasQuestion = new ArrayBlockingQueue<Employee>(NUMQUESTIONS);
 	private volatile boolean attendedMeeting1 = false;
 	private volatile boolean attendedMeeting2 = false;
 	private volatile boolean ateLunch = false;
@@ -44,7 +44,7 @@ public class Manager extends Thread {
 			office.waitForStandupMeeting();
 			long endCheck = System.currentTimeMillis();
 			
-			timeSpentWorking =+ (endCheck - startCheck)/10;
+			timeSpentWorking += (endCheck - startCheck)/10;
 			
 			startCheck = System.currentTimeMillis();
 			Thread.sleep(150);
