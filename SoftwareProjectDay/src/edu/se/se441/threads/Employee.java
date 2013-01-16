@@ -71,13 +71,31 @@ public class Employee extends Thread {
 		
 		// Start main while loop here.
 		while(true){
-			try {
-				synchronized(this){
-					wait();
-				}
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			// Wait until Employee should do something
+			office.startWorking();
+
+			// If Leader, and question, ask manager
+			if(isLead && isWaitingQuestion){
+				office.getManager().askQuestion(this);
 			}
+			
+			// Should a question be asked?
+			int random = r.nextInt(20);
+			//decides whether or not to ask a question
+			if(random == 0){
+				//Team lead asking a question
+				if(isLead){
+					office.getManager().askQuestion(this);
+				}
+				//Employee asking a question
+				else{
+					if(r.nextBoolean()){
+						office.getLead(teamNumber).askQuestion(this);						
+					}
+				}
+			}
+			
+			
 			// Check 1: Is it time to go home?
 			if(office.getTime() >= dayEndTime){
 				// End the thread
@@ -106,27 +124,6 @@ public class Employee extends Thread {
 				}
 				attendedEndOfDayMeeting = true;
 			}
-			
-			if(isLead && isWaitingQuestion){
-				office.getManager().askQuestion(this);
-			}
-			
-			// Last Check
-			// Check 2: Should a question be asked?
-			int random = r.nextInt(20);
-			//decides whether or not to ask a question
-			if(random == 0){
-				//Team lead asking a question
-				if(isLead){
-					office.getManager().askQuestion(this);
-				}
-				//Employee asking a question
-				else{
-					if(r.nextBoolean()){
-						office.getLead(teamNumber).askQuestion(this);						
-					}
-				}
-			}
 		}
 		System.out.println(office.getTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " leaves");
 	}
@@ -138,33 +135,30 @@ public class Employee extends Thread {
 			synchronized(leadQLock){
 				// Leader already has a question that hasn't been answered.
 				while(teamLeader.isWaitingQuestion){
-					wait();
+					leadQLock.wait();
 				}
 				
 				// Set our question.
 				teamLeader.getsQuestion();
-				notifyAll();
+				office.notifyWorking();
 			}
 
 			synchronized(office.getManager().getQuestionLock()){
-				while(teamLeader.isWaitingQuestion){
-					wait();
-				}
 				// Is the manager answering the question
-				while(office.getManager().isLeadAsking(teamLeader)){
+				while(teamLeader.isWaitingQuestion){
 					if(office.getTime() >= 1600 && !attendedEndOfDayMeeting){
 						office.waitForEndOfDayMeeting();
 						sleep(150);
 						attendedEndOfDayMeeting = true;
 					}
-					wait();
+					office.getManager().getQuestionLock().wait();
 				}
 			
 				
 			}
 			synchronized(leadQLock){
 				teamLeader.questionAnswered();
-				notifyAll();
+				leadQLock.notifyAll();
 			}
 		}catch (InterruptedException e) {
 			e.printStackTrace();

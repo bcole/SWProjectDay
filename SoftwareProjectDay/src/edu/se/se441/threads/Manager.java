@@ -35,13 +35,8 @@ public class Manager extends Thread {
 		}
 		
 		while(office.getTime() < 1700){
-			try {
-				synchronized(this){
-					wait();
-				}
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			office.startWorking();
+			
 			while(!hasQuestion.isEmpty()){
 				answerQuestion();
 			}
@@ -108,7 +103,10 @@ public class Manager extends Thread {
 						sleep(150);
 						employee.setAttendedEndOfDayMeeting(true);
 					}
-					wait();
+					
+					// Tell the Manager there is a question.
+					office.notifyWorking();
+					questionLock.wait();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -117,7 +115,7 @@ public class Manager extends Thread {
 			// Question is being answered
 			while(employee.isWaitingQuestion()){
 				try {
-					wait();
+					questionLock.wait();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -135,7 +133,10 @@ public class Manager extends Thread {
 	
 	private void answerQuestion(){
 		Employee employee = hasQuestion.poll();
-		questionLock.notifyAll();
+		synchronized(questionLock){
+			questionLock.notifyAll();
+		}
+		
 		try {
 			sleep(100);
 		} catch (InterruptedException e) {
@@ -143,7 +144,10 @@ public class Manager extends Thread {
 		}
 		
 		employee.questionAnswered();
-		questionLock.notifyAll();
+		
+		synchronized(questionLock){
+			questionLock.notifyAll();
+		}
 	}
 
 }
