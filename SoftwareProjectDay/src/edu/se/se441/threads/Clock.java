@@ -42,7 +42,7 @@ public class Clock extends Thread{
 					}
 				}
 			}
-			int random = r.nextInt(100000);
+			int random = r.nextInt(500000);
 			if(random == 0 && office != null){	// Firing random questions.
 				numOfQuestions++;
 				office.notifyWorking();
@@ -51,6 +51,9 @@ public class Clock extends Thread{
 		System.out.println(numOfQuestions);
 		System.out.println("CLOCK ENDED");
 		office.notifyWorking();
+		synchronized(office.getManager().getQuestionLock()){
+			office.getManager().getQuestionLock().notifyAll();
+		}
 	}
 	
 	/**

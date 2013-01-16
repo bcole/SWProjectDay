@@ -20,6 +20,7 @@ public class Manager extends Thread {
 	private long timeSpentInMeetings = 0;
 	private long timeSpentWorking = 0;
 	private long timeSpentAtLunch = 0;
+	private volatile boolean atWork;
 
 	
 	public Manager(Office office){
@@ -39,6 +40,7 @@ public class Manager extends Thread {
 			startSignal.await();
 			
 			System.out.println(office.getStringTime() + " Manager arrives at office");
+			atWork = true;
 			long startCheck = System.currentTimeMillis();
 			// Waiting for team leads for the meeting.
 			office.waitForStandupMeeting();
@@ -76,13 +78,23 @@ public class Manager extends Thread {
 			
 		}
 		System.out.println(office.getStringTime() + " Manager leaves");
-		
+		atWork = false;
+		synchronized(office.getLeadQLock()){
+			office.getLeadQLock().notifyAll();
+		}
+		synchronized(questionLock){
+			questionLock.notifyAll();
+		}
 		System.out.println("Manager report: a) " + timeSpentWorking + " b) " + timeSpentAtLunch +
 				" c) " + timeSpentInMeetings + " d) " + timeSpentAnsweringQuestions);
 	}
 	
 	public void setStartSignal(CountDownLatch startSignal) {
 		this.startSignal = startSignal;
+	}
+	
+	public boolean atWork(){
+		return atWork;
 	}
 	
 	public void checkConditions(){
@@ -138,8 +150,17 @@ public class Manager extends Thread {
 			}
 		}
 		
-		// Is it time for the 4 oclock meeting?
+		// Is it time for the 4 o'clock meeting?
 		if(office.getTime() >= 1600 && !attendedFinalMeeting){
+			synchronized(questionLock){
+				questionLock.notifyAll();
+			}
+			for(int i = 0; i < 3; i++){
+				synchronized(office.getLead(i).getLeadQLock()){
+					office.getLead(i).getLeadQLock().notifyAll();
+				}
+			}
+			System.out.println("Manager is waiting for end of day meeting");
 			office.waitForEndOfDayMeeting();
 			try {
 				long startCheck = System.currentTimeMillis();				
@@ -212,7 +233,7 @@ public class Manager extends Thread {
 			}
 			
 			try {
-				System.out.println(office.getStringTime() + " Manager starts answering question.");
+				System.out.println(office.getStringTime() + " Manager starts answering question from Developer" + employee.getEmployeeName() +  ".");
 				sleep(100);
 				System.out.println(office.getStringTime() + " Manager ends answering question.");
 			} catch (InterruptedException e) {
@@ -225,7 +246,8 @@ public class Manager extends Thread {
 			}
 		} else{
 			while(!hasQuestion.isEmpty()){
-				hasQuestion.poll();
+				employee = hasQuestion.poll();
+				employee.questionAnswered();
 			}
 			synchronized(questionLock){
 				questionLock.notifyAll();

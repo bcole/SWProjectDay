@@ -25,6 +25,7 @@ public class Office {
 	// Locks.
 	private Object workingLock = new Object();
 	private Object confRoomLock = new Object();
+	private Object leadQLock = new Object();
 	
 	public Office(Clock clock){
 		this.clock = clock;
@@ -51,6 +52,10 @@ public class Office {
 		synchronized(workingLock){
 			workingLock.notifyAll();
 		}
+	}
+	
+	public Object getLeadQLock(){
+		return leadQLock;
 	}
 	
 	public long getTime(){

@@ -16,7 +16,7 @@ public class Employee extends Thread {
 	
 	// Meeting attended Booleans
 	private volatile boolean attendedEndOfDayMeeting;
-	private Object leadQLock = new Object();
+	private Object leadQLock;
 	private int teamNumber, empNumber;
 	private boolean isLead;
 	private volatile boolean isWaitingQuestion;
@@ -26,6 +26,7 @@ public class Employee extends Thread {
 	private long timeSpentInMeetings = 0;
 	private long timeSpentWorking = 0;
 	private long timeSpentAtLunch = 0;
+	private volatile boolean atWork;
 
 	
 	public Employee(boolean isLead, Office office, int teamNumber, int empNumber){
@@ -36,6 +37,7 @@ public class Employee extends Thread {
 		this.teamNumber = teamNumber;
 		this.empNumber = empNumber;
 		if(isLead) office.setLead(teamNumber, this);
+		leadQLock = office.getLeadQLock();
 	}
 
 	public void run(){
@@ -50,6 +52,7 @@ public class Employee extends Thread {
 
 			System.out.println(office.getStringTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " arrives at office");
 			dayStartTime = office.getTime();
+			atWork = true;
 			dayEndTime = dayStartTime + 800;	// Work at least 8 hours
 			lunchTime = r.nextInt(60) + 1200 + r.nextInt(2)*100;	// Lunch starts between 12 and 2
 			// BUG FIX (if slow computer / overpowered / hardware problem, force a short lunch)
@@ -89,7 +92,7 @@ public class Employee extends Thread {
 		}
 		
 		// Start main while loop here.
-		while(office.getTime() < 1700){
+		while(true){
 			// Wait until Employee should do something
 			long startCheck = System.currentTimeMillis();
 			office.startWorking();
@@ -102,7 +105,7 @@ public class Employee extends Thread {
 			}
 
 			// If Leader, and question, ask manager
-			if(isLead && isWaitingQuestion){
+			if(isLead && isWaitingQuestion && !office.getManager().atWork()){
 				System.out.println(office.getStringTime() + " Developer " + getEmployeeName() + " passes the question to the Manager.");
 				office.getManager().askQuestion(this);
 			}
@@ -112,13 +115,13 @@ public class Employee extends Thread {
 			//decides whether or not to ask a question
 			if(random == 0){
 				//Team lead asking a question
-				if(isLead){
+				if(isLead && !office.getManager().atWork()){
 					System.out.println(office.getStringTime() + " Developer " + getEmployeeName() + " asks Manager a question.");
 					office.getManager().askQuestion(this);
 				}
 				//Employee asking a question
 				else{
-					if(r.nextBoolean()){
+					if(r.nextBoolean() && office.getLead(teamNumber).atWork){
 						System.out.println(office.getStringTime() + " Developer " + getEmployeeName() + " asks Team Lead a question (doesn't have answer).");
 						office.getLead(teamNumber).askQuestion(this);						
 					} else {
@@ -132,6 +135,10 @@ public class Employee extends Thread {
 			}
 		}
 		System.out.println(office.getStringTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " leaves");
+		atWork = false;
+		synchronized(office.getLeadQLock()){
+			office.getLeadQLock().notifyAll();
+		}
 		System.out.println("Developer " + getEmployeeName() +" report: a) " + timeSpentWorking + " b) " + 
 					timeSpentAtLunch + " c) " +  timeSpentInMeetings + " d) " + timeSpentWaitingForAnswers);
 	}
@@ -165,6 +172,9 @@ public class Employee extends Thread {
 		// Is it time for the 4 oclock meeting?
 		if(office.getTime() >= 1600 && !attendedEndOfDayMeeting){
 			long startCheck = System.currentTimeMillis();
+			synchronized (leadQLock){
+				leadQLock.notifyAll();
+			}
 			office.waitForEndOfDayMeeting();
 			try {
 				System.out.println(office.getStringTime() + " Developer " + (int)(teamNumber+1) + "" + (int)(empNumber+1) + " attends end of day meeting");
@@ -182,6 +192,10 @@ public class Employee extends Thread {
 		return true;
 	}
 	
+	public Object getLeadQLock(){
+		return leadQLock;
+	}
+	
 	// Only for Team Leaders, called when asked a question that needs to be passed up to manager.
 	public void askQuestion(Employee asker){
 		Employee teamLeader = office.getLead(teamNumber);
@@ -190,9 +204,22 @@ public class Employee extends Thread {
 				long startTime = System.currentTimeMillis();
 				// Leader already has a question that hasn't been answered.
 				while(teamLeader.isWaitingQuestion()){
+					System.out.println("Developer " + asker.getEmployeeName() + " Derp");
+					if(office.getTime() >= 1600 && !attendedEndOfDayMeeting){
+						long startCheck = System.currentTimeMillis();
+						System.out.println(office.getTime() + " Developer " + getEmployeeName() + " heads over to end of day meeting.");
+						office.waitForEndOfDayMeeting();
+						System.out.println(office.getTime() + " Developer " + getEmployeeName() + " attends end of day meeting." );
+						sleep(150);
+						long endCheck = System.currentTimeMillis();
+						
+						timeSpentInMeetings += (endCheck - startCheck)/10;
+						
+						attendedEndOfDayMeeting = true;
+					}
 					leadQLock.wait();
 				}
-				if(office.getTime() > 1700) return;
+				if(office.getTime() > 1700 && !office.getLead(teamNumber).atWork) return;
 				
 				// Set our question.
 				teamLeader.getsQuestion();
