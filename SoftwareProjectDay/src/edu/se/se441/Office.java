@@ -163,7 +163,6 @@ public class Office {
 	public void waitForEndOfDayMeeting() {
 		try {
 			endOfDayMeeting.await();
-			System.out.println(getStringTime() + " Everyone has arrived for the end of day meeting.");
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		} catch (BrokenBarrierException e2) {
