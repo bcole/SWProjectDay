@@ -106,6 +106,7 @@ public class Office {
 	public void waitForStandupMeeting(){
 		try {
 			standupMeeting.await();
+			System.out.println(getStringTime() + " The Standup Meeting Starts");
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		} catch (BrokenBarrierException e2) {
@@ -132,23 +133,25 @@ public class Office {
 						teamMeetings[teamNumber].reset();
 						fillConfRoom(teamNumber);
 					} else {
-						//System.out.println(employee.getEmployeeName() + " stuck")
 						// Wait until the room is open.
 						confRoomLock.wait();
-					
-						//System.out.println(employee.getEmployeeName() + " Unstuck");
 					}
 				}
 				
 			}
 			
 			confRoom++;
+			System.out.println(getStringTime() + " " + employee.getEmployeeName() + 
+					" has entered the conference room.");
 			// Synchronize other team members to start the meeting at the same time.
 			teamMeetings[teamNumber].await();
-			
+			if(employee.isLead()){
+				System.out.println(getStringTime() +" Team " + (int)(teamNumber + 1) + " starts their team meeting.");
+			}
 			// Meeting starts.
 			Thread.sleep(150);
 			// Meeting ends.
+			System.out.println(getStringTime() +" Team " + (int)(teamNumber + 1) + " meeting has ended.");
 			emptyConfRoom();		
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
@@ -160,6 +163,7 @@ public class Office {
 	public void waitForEndOfDayMeeting() {
 		try {
 			endOfDayMeeting.await();
+			System.out.println(getStringTime() + " Everyone has arrived for the end of day meeting.");
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		} catch (BrokenBarrierException e2) {
@@ -206,7 +210,7 @@ public class Office {
 	public void fillConfRoom(int teamNumber) {
 		synchronized(confRoomLock){
 			confRoomUsedBy = teamNumber;
-			System.out.println(getStringTime() + " Conference room accquired by team " + (int)(teamNumber+1));
+			System.out.println(getStringTime() + " conference room accquired by team " + (int)(teamNumber+1));
 		}
 	}
 	
@@ -217,7 +221,6 @@ public class Office {
 			// Only let the last one out notifyAll.
 			if(confRoom == 0){
 				confRoomUsedBy = -1;
-				System.out.println(getStringTime() + " Conference Room Released");
 				confRoomLock.notifyAll();
 			}
 		}
