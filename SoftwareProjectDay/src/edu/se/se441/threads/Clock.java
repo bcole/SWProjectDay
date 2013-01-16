@@ -50,6 +50,7 @@ public class Clock extends Thread{
 		}
 		System.out.println(numOfQuestions);
 		System.out.println("CLOCK ENDED");
+		office.notifyWorking();
 	}
 	
 	/**
