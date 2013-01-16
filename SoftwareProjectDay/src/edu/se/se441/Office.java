@@ -19,8 +19,8 @@ public class Office {
     private Employee[] leads = new Employee[3];
 
     // Capacity of conference room.
-    private int confRoom = 0;
-    private int confRoomUsedBy = -1;
+    private volatile int confRoom = 0;
+    private volatile int confRoomUsedBy = -1;
 
     // Locks.
     private Object workingLock = new Object();
@@ -166,11 +166,17 @@ public class Office {
 	try {
 	    //We wait for the conference room to be open or contain our team
 	    synchronized(confRoomLock){
+		System.out.println("Employee " + employee.getName() + "wants the room");
+		System.out.println("The room is used by " + getConfRoomUsedBy());
 		while(getConfRoomUsedBy() != teamNumber){
 		    if(confRoomOpen()){
 			// Fill the room.
 			teamMeetings[teamNumber].reset();
-			fillConfRoom(teamNumber);
+			//fillConfRoom(teamNumber);
+			confRoomUsedBy = teamNumber;
+			System.out.println(getStringTime() + " conference room accquired by team " 
+				+ (int)(teamNumber+1));
+			
 		    } else {
 			// Wait until the room is open.
 			confRoomLock.wait();
@@ -274,7 +280,7 @@ public class Office {
      */
     public boolean confRoomOpen() {
 	synchronized(confRoomLock){
-	    return confRoom==0;
+	    return confRoomUsedBy==-1;
 	}
     }
 
@@ -283,10 +289,10 @@ public class Office {
      * @param teamNumber the team acquiring the lock
      */
     public void fillConfRoom(int teamNumber) {
-	synchronized(confRoomLock){
+	//synchronized(confRoomLock){
 	    confRoomUsedBy = teamNumber;
 	    System.out.println(getStringTime() + " conference room accquired by team " + (int)(teamNumber+1));
-	}
+	//}
     }
 
     /**

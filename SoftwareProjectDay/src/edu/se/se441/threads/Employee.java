@@ -68,7 +68,7 @@ public class Employee extends Thread {
 	    dayEndTime = dayStartTime + 800;	// Work at least 8 hours
 	    lunchTime = r.nextInt(60) + 1200 + r.nextInt(2)*100;	// Lunch starts between 12 and 2
 	    // BUG FIX (if slow computer / overpowered / hardware problem, force a short lunch):
-	    if((1700-dayEndTime-70) < 0){
+	    if((1700-dayEndTime-70) <= 0){
 		lunchDuration = 30 + (1700-dayEndTime-70);
 	    } else {
 		lunchDuration = r.nextInt((int)(1700-dayEndTime-70)) + 30;	// Figure out lunch duration
