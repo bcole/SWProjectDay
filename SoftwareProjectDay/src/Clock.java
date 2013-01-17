@@ -1,11 +1,10 @@
-package edu.se.se441.threads;
+
 
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
-import edu.se.se441.Office;
 
 public class Clock extends Thread{
 

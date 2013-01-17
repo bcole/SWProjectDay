@@ -19,10 +19,18 @@ team and position. One example is Developer "32" - He is the second
 developer on team 3. Team leads are considered the first developer in
 their team.
 Here is an example output from the program:
-8:43 14 has entered the conference room.
-8:43 12 has entered the conference room.
-8:43 Team 1 starts their team meeting.
-8:58 Team 1 meeting has ended.
-8:58 Team 1 meeting has ended.
-8:58 Developer 12 left team meeting
-8:58 Developer 13 left team meeting
+12:00 Manager goes to lunch
+12:00 Developer 22 asks Team Lead a question (has answer).
+12:06 Developer 23 goes to lunch
+12:15 Developer 13 goes to lunch
+12:15 Developer 24 asks Team Lead a question (doesn't have answer).
+12:15 Developer 21 passes the question to the Manager.
+12:15 Developer 22 asks Team Lead a question (has answer).
+12:22 Developer 32 asks Team Lead a question (has answer).
+12:22 Developer 33 goes to lunch
+12:41 Developer 12 goes to lunch
+1:00 Manager starts answering question from Developer 21.
+1:02 Developer 11 goes to lunch
+1:02 Developer 23 asks Team Lead a question (has answer).
+1:10 Manager answers question.
+1:10 Developer 32 goes to lunch
